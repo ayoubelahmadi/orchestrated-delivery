@@ -15,6 +15,7 @@ import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as ReferentielRouteImport } from './routes/referentiel'
 import { Route as SquadsRouteImport } from './routes/squads'
 import { Route as DemandesIdIndexRouteImport } from './routes/demandes/$id/index'
+import { Route as DemandesIdLivrablesRouteImport } from './routes/demandes/$id/livrables'
 import { Route as DemandesIdProcessusRouteImport } from './routes/demandes/$id/processus'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const DemandesIdIndexRoute = DemandesIdIndexRouteImport.update({
   path: '/demandes/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemandesIdLivrablesRoute = DemandesIdLivrablesRouteImport.update({
+  id: '/demandes/$id/livrables',
+  path: '/demandes/$id/livrables',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemandesIdProcessusRoute = DemandesIdProcessusRouteImport.update({
   id: '/demandes/$id/processus',
   path: '/demandes/$id/processus',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/pipeline': typeof PipelineRoute
   '/referentiel': typeof ReferentielRoute
   '/squads': typeof SquadsRoute
+  '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
   '/demandes/$id/processus': typeof DemandesIdProcessusRoute
   '/demandes/$id/': typeof DemandesIdIndexRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/pipeline': typeof PipelineRoute
   '/referentiel': typeof ReferentielRoute
   '/squads': typeof SquadsRoute
+  '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
   '/demandes/$id/processus': typeof DemandesIdProcessusRoute
   '/demandes/$id': typeof DemandesIdIndexRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/pipeline': typeof PipelineRoute
   '/referentiel': typeof ReferentielRoute
   '/squads': typeof SquadsRoute
+  '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
   '/demandes/$id/processus': typeof DemandesIdProcessusRoute
   '/demandes/$id/': typeof DemandesIdIndexRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/referentiel'
     | '/squads'
+    | '/demandes/$id/livrables'
     | '/demandes/$id/processus'
     | '/demandes/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/referentiel'
     | '/squads'
+    | '/demandes/$id/livrables'
     | '/demandes/$id/processus'
     | '/demandes/$id'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/referentiel'
     | '/squads'
+    | '/demandes/$id/livrables'
     | '/demandes/$id/processus'
     | '/demandes/$id/'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   PipelineRoute: typeof PipelineRoute
   ReferentielRoute: typeof ReferentielRoute
   SquadsRoute: typeof SquadsRoute
+  DemandesIdLivrablesRoute: typeof DemandesIdLivrablesRoute
   DemandesIdProcessusRoute: typeof DemandesIdProcessusRoute
   DemandesIdIndexRoute: typeof DemandesIdIndexRoute
 }
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemandesIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demandes/$id/livrables': {
+      id: '/demandes/$id/livrables'
+      path: '/demandes/$id/livrables'
+      fullPath: '/demandes/$id/livrables'
+      preLoaderRoute: typeof DemandesIdLivrablesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demandes/$id/processus': {
       id: '/demandes/$id/processus'
       path: '/demandes/$id/processus'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   PipelineRoute: PipelineRoute,
   ReferentielRoute: ReferentielRoute,
   SquadsRoute: SquadsRoute,
+  DemandesIdLivrablesRoute: DemandesIdLivrablesRoute,
   DemandesIdProcessusRoute: DemandesIdProcessusRoute,
   DemandesIdIndexRoute: DemandesIdIndexRoute,
 }
