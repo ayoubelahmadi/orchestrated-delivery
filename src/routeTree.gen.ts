@@ -17,6 +17,7 @@ import { Route as SquadsRouteImport } from './routes/squads'
 import { Route as DemandesIdIndexRouteImport } from './routes/demandes/$id/index'
 import { Route as DemandesIdLivrablesRouteImport } from './routes/demandes/$id/livrables'
 import { Route as DemandesIdProcessusRouteImport } from './routes/demandes/$id/processus'
+import { Route as DemandesIdTachesTaskIdRouteImport } from './routes/demandes/$id/taches/$taskId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +59,11 @@ const DemandesIdProcessusRoute = DemandesIdProcessusRouteImport.update({
   path: '/demandes/$id/processus',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemandesIdTachesTaskIdRoute = DemandesIdTachesTaskIdRouteImport.update({
+  id: '/demandes/$id/taches/$taskId',
+  path: '/demandes/$id/taches/$taskId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
   '/demandes/$id/processus': typeof DemandesIdProcessusRoute
   '/demandes/$id/': typeof DemandesIdIndexRoute
+  '/demandes/$id/taches/$taskId': typeof DemandesIdTachesTaskIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
   '/demandes/$id/processus': typeof DemandesIdProcessusRoute
   '/demandes/$id': typeof DemandesIdIndexRoute
+  '/demandes/$id/taches/$taskId': typeof DemandesIdTachesTaskIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
   '/demandes/$id/processus': typeof DemandesIdProcessusRoute
   '/demandes/$id/': typeof DemandesIdIndexRoute
+  '/demandes/$id/taches/$taskId': typeof DemandesIdTachesTaskIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/demandes/$id/livrables'
     | '/demandes/$id/processus'
     | '/demandes/$id/'
+    | '/demandes/$id/taches/$taskId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/demandes/$id/livrables'
     | '/demandes/$id/processus'
     | '/demandes/$id'
+    | '/demandes/$id/taches/$taskId'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/demandes/$id/livrables'
     | '/demandes/$id/processus'
     | '/demandes/$id/'
+    | '/demandes/$id/taches/$taskId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   DemandesIdLivrablesRoute: typeof DemandesIdLivrablesRoute
   DemandesIdProcessusRoute: typeof DemandesIdProcessusRoute
   DemandesIdIndexRoute: typeof DemandesIdIndexRoute
+  DemandesIdTachesTaskIdRoute: typeof DemandesIdTachesTaskIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemandesIdProcessusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demandes/$id/taches/$taskId': {
+      id: '/demandes/$id/taches/$taskId'
+      path: '/demandes/$id/taches/$taskId'
+      fullPath: '/demandes/$id/taches/$taskId'
+      preLoaderRoute: typeof DemandesIdTachesTaskIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemandesIdLivrablesRoute: DemandesIdLivrablesRoute,
   DemandesIdProcessusRoute: DemandesIdProcessusRoute,
   DemandesIdIndexRoute: DemandesIdIndexRoute,
+  DemandesIdTachesTaskIdRoute: DemandesIdTachesTaskIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
