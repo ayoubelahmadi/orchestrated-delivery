@@ -153,7 +153,7 @@ export function AgentRunPanel({
                 {logs.map((line, i) => (
                   <motion.p
                     key={line + i}
-                    initial={{ opacity: 0, y: 6 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex items-start gap-2"
                   >
@@ -173,7 +173,7 @@ export function AgentRunPanel({
 
           {phase === "done" && (
             <motion.section
-              initial={{ opacity: 0, y: 10 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               className="panel overflow-hidden"
             >

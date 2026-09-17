@@ -157,7 +157,7 @@ function DemandeDetail() {
                 return (
                   <motion.div
                     key={t.id}
-                    initial={{ opacity: 0, y: 6 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     className="rounded-xl border p-4"
                   >
