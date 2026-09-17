@@ -45,7 +45,7 @@ function AiGauge({ rate }: { rate: number }) {
   const offset = circumference * (1 - rate / 100);
 
   return (
-    <div className="relative grid size-36 shrink-0 place-items-center sm:size-44">
+    <div className="relative grid size-28 shrink-0 place-items-center sm:size-36">
       <svg className="size-full -rotate-90" viewBox="0 0 112 112" aria-hidden="true">
         <circle cx="56" cy="56" r="46" fill="none" stroke="currentColor" strokeWidth="5" className="text-background/12" />
         <motion.circle
@@ -65,7 +65,7 @@ function AiGauge({ rate }: { rate: number }) {
         />
       </svg>
       <div className="absolute text-center">
-        <span className="block text-3xl font-semibold sm:text-4xl">{rate}%</span>
+        <span className="block text-2xl font-semibold sm:text-3xl">{rate}%</span>
         <span className="text-background/55 mt-1 block text-[10px] font-semibold uppercase">Exécution IA</span>
       </div>
     </div>
@@ -92,15 +92,15 @@ function Dashboard() {
   }));
 
   return (
-    <div className="mx-auto w-full max-w-[1480px] px-4 py-7 sm:px-8 sm:py-10 xl:px-12">
+    <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-7 sm:py-7 xl:px-10">
       <motion.header
         initial={false}
         animate={{ opacity: 1, y: 0 }}
-        className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-7 duration-500 lg:flex-row lg:items-end lg:justify-between"
+        className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-5 duration-500 lg:flex-row lg:items-end lg:justify-between"
       >
         <div className="max-w-3xl">
           <p className="eyebrow flex items-center gap-2"><span className="bg-primary size-1.5 rounded-full" /> Jeudi · Vue Factory Manager</p>
-          <h1 className="mt-3 text-4xl font-semibold leading-[1.05] sm:text-5xl xl:text-6xl">
+          <h1 className="mt-2 text-3xl font-semibold leading-[1.08] sm:text-4xl xl:text-5xl">
             Bonjour Mehdi.<br />
             <span className="text-muted-foreground">La Factory avance.</span>
           </h1>
@@ -115,8 +115,8 @@ function Dashboard() {
         </div>
       </motion.header>
 
-      <section className="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border lg:grid-cols-[1.45fr_0.8fr]">
-        <div className="bg-foreground text-background relative min-h-[420px] overflow-hidden p-6 sm:p-9">
+      <section className="mt-7 grid gap-px overflow-hidden rounded-xl border bg-border lg:grid-cols-[1.4fr_0.85fr]">
+        <div className="bg-foreground text-background relative min-h-[340px] overflow-hidden p-5 sm:p-7">
           <div className="relative z-10 flex h-full flex-col">
             <div className="flex items-center justify-between gap-4">
               <p className="text-background/55 text-xs font-semibold uppercase">Signal de production</p>
@@ -125,18 +125,18 @@ function Dashboard() {
               </span>
             </div>
 
-            <div className="mt-10 flex flex-1 flex-col justify-between gap-10 sm:flex-row sm:items-center">
+            <div className="mt-7 flex flex-1 flex-col justify-between gap-7 sm:flex-row sm:items-center">
               <div className="max-w-md">
-                <p className="text-primary text-7xl font-semibold sm:text-8xl">{totalProgress}%</p>
-                <h2 className="mt-4 text-2xl font-medium">du portefeuille a franchi son étape en cours.</h2>
-                <p className="text-background/55 mt-3 max-w-sm text-sm leading-relaxed">
+                <p className="text-primary text-6xl font-semibold sm:text-7xl">{totalProgress}%</p>
+                <h2 className="mt-3 text-xl font-medium sm:text-2xl">du portefeuille a franchi son étape en cours.</h2>
+                <p className="text-background/55 mt-2 max-w-sm text-sm leading-relaxed">
                   {completed} tâches terminées. Le rythme progresse, mais {blocked.length} points demandent votre arbitrage.
                 </p>
               </div>
               <AiGauge rate={rate} />
             </div>
 
-            <div className="border-background/15 mt-10 grid grid-cols-5 border-t pt-5">
+            <div className="border-background/15 mt-7 grid grid-cols-5 border-t pt-4">
               {stageCounts.map(({ stage, count }) => (
                 <div key={stage} className="border-background/10 border-r px-2 first:pl-0 last:border-r-0">
                   <span className="text-background/45 block text-[10px] uppercase">{stage}</span>
@@ -147,7 +147,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-surface p-6 sm:p-8">
+        <div className="bg-surface p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow">À arbitrer aujourd’hui</p>
@@ -158,7 +158,7 @@ function Dashboard() {
             </span>
           </div>
 
-          <div className="mt-7 divide-y">
+          <div className="mt-5 divide-y">
             {blocked.slice(0, 3).map((task, index) => {
               const demande = demandes.find((item) => item.id === task.demandeId);
               return (
@@ -166,7 +166,7 @@ function Dashboard() {
                   key={task.id}
                   to="/demandes/$id/taches/$taskId"
                   params={{ id: task.demandeId, taskId: task.id }}
-                  className="group grid grid-cols-[2rem_1fr_auto] gap-3 py-5 first:pt-0"
+                  className="group grid grid-cols-[2rem_1fr_auto] gap-3 py-4 first:pt-0"
                 >
                   <span className="text-muted-foreground font-mono text-xs">0{index + 1}</span>
                   <span className="min-w-0">
@@ -189,10 +189,10 @@ function Dashboard() {
           { icon: Clock3, value: "2,4 j", label: "par étape", note: "−0,3 j ce mois" },
           { icon: CheckCircle2, value: completed, label: "tâches livrées", note: "Sur la période" },
         ].map((metric, index) => (
-          <div key={metric.label} className={cn("border-b p-5 sm:p-6 lg:border-b-0", index < 3 && "lg:border-r", index % 2 === 0 && "sm:border-r")}>
+          <div key={metric.label} className={cn("border-b p-4 sm:p-5 lg:border-b-0", index < 3 && "lg:border-r", index % 2 === 0 && "sm:border-r")}>
             <metric.icon className="text-muted-foreground size-4" />
-            <div className="mt-5 flex items-baseline gap-2">
-              <span className="text-3xl font-semibold">{metric.value}</span>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-2xl font-semibold">{metric.value}</span>
               <span className="text-muted-foreground text-xs">{metric.label}</span>
             </div>
             <p className="text-muted-foreground mt-1 text-xs">{metric.note}</p>
@@ -200,11 +200,11 @@ function Dashboard() {
         ))}
       </section>
 
-      <section className="mt-14">
-        <div className="flex items-end justify-between gap-4 border-b pb-5">
+      <section className="mt-10">
+        <div className="flex items-end justify-between gap-4 border-b pb-4">
           <div>
             <p className="eyebrow">Portefeuille vivant</p>
-            <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Ce qui bouge maintenant</h2>
+            <h2 className="mt-2 text-xl font-semibold sm:text-2xl">Ce qui bouge maintenant</h2>
           </div>
           <Button asChild variant="ghost" size="sm" className="rounded-lg">
             <Link to="/pipeline">Tout voir <ArrowRight className="size-4" /></Link>
@@ -228,7 +228,7 @@ function Dashboard() {
                 <Link
                   to="/demandes/$id"
                   params={{ id: demande.id }}
-                  className="group grid gap-5 py-6 transition-colors sm:grid-cols-[2.5rem_minmax(0,1.2fr)_minmax(180px,0.8fr)_auto] sm:items-center"
+                  className="group grid gap-4 py-4 transition-colors sm:grid-cols-[2.5rem_minmax(0,1.2fr)_minmax(180px,0.8fr)_auto] sm:items-center"
                 >
                   <span className="text-muted-foreground font-mono text-xs">0{index + 1}</span>
                   <div className="min-w-0">
