@@ -168,3 +168,24 @@
   text-transform: uppercase;
   color: var(--color-muted-foreground);
 }
+
+@utility dashboard-progress {
+  appearance: none;
+  border: 0;
+  background-color: var(--color-muted);
+
+  &::-webkit-progress-bar {
+    background-color: var(--color-muted);
+    border-radius: 999px;
+  }
+
+  &::-webkit-progress-value {
+    background-color: var(--color-primary);
+    border-radius: 999px;
+  }
+
+  &::-moz-progress-bar {
+    background-color: var(--color-primary);
+    border-radius: 999px;
+  }
+}

@@ -60,7 +60,8 @@ function AiGauge({ rate }: { rate: number }) {
           initial={false}
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 0.9, ease: "easeOut" }}
-          style={{ strokeDasharray: circumference, strokeDashoffset: circumference }}
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference}
         />
       </svg>
       <div className="absolute text-center">
@@ -239,9 +240,12 @@ function Dashboard() {
                       <span className="font-medium">{currentStage(demande)}</span>
                       <span className="text-muted-foreground">{percent}%</span>
                     </div>
-                    <div className="bg-muted mt-2 h-1 overflow-hidden rounded-full">
-                      <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${percent}%` }} />
-                    </div>
+                    <progress
+                      className="dashboard-progress mt-2 block h-1 w-full overflow-hidden rounded-full"
+                      value={percent}
+                      max={100}
+                      aria-label={`${percent}% terminé`}
+                    />
                   </div>
                   <div className="flex items-center justify-between gap-5 sm:justify-end">
                     <AvatarStack people={squadPeople} agents={squadAgents} />
