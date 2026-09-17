@@ -46,10 +46,10 @@ function Kpi({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.35 }}
-      className="panel p-5"
+      className="panel animate-in fade-in slide-in-from-bottom-2 p-5 duration-500"
     >
       <p className="text-muted-foreground text-sm">{label}</p>
       <p className="mt-2 text-4xl font-semibold tracking-tight">{value}</p>
