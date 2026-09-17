@@ -10,33 +10,154 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as ReferentielRouteImport } from './routes/referentiel'
+import { Route as SquadsRouteImport } from './routes/squads'
+import { Route as DemandesNouvelleRouteImport } from './routes/demandes/nouvelle'
+import { Route as DemandesIdIndexRouteImport } from './routes/demandes/$id/index'
+import { Route as DemandesIdLivrablesRouteImport } from './routes/demandes/$id/livrables'
+import { Route as DemandesIdProcessusRouteImport } from './routes/demandes/$id/processus'
+import { Route as DemandesIdTachesTaskIdRouteImport } from './routes/demandes/$id/taches/$taskId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParametresRoute = ParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PipelineRoute = PipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferentielRoute = ReferentielRouteImport.update({
+  id: '/referentiel',
+  path: '/referentiel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SquadsRoute = SquadsRouteImport.update({
+  id: '/squads',
+  path: '/squads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemandesNouvelleRoute = DemandesNouvelleRouteImport.update({
+  id: '/demandes/nouvelle',
+  path: '/demandes/nouvelle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemandesIdIndexRoute = DemandesIdIndexRouteImport.update({
+  id: '/demandes/$id/',
+  path: '/demandes/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemandesIdLivrablesRoute = DemandesIdLivrablesRouteImport.update({
+  id: '/demandes/$id/livrables',
+  path: '/demandes/$id/livrables',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemandesIdProcessusRoute = DemandesIdProcessusRouteImport.update({
+  id: '/demandes/$id/processus',
+  path: '/demandes/$id/processus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemandesIdTachesTaskIdRoute = DemandesIdTachesTaskIdRouteImport.update({
+  id: '/demandes/$id/taches/$taskId',
+  path: '/demandes/$id/taches/$taskId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/parametres': typeof ParametresRoute
+  '/pipeline': typeof PipelineRoute
+  '/referentiel': typeof ReferentielRoute
+  '/squads': typeof SquadsRoute
+  '/demandes/nouvelle': typeof DemandesNouvelleRoute
+  '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
+  '/demandes/$id/processus': typeof DemandesIdProcessusRoute
+  '/demandes/$id/': typeof DemandesIdIndexRoute
+  '/demandes/$id/taches/$taskId': typeof DemandesIdTachesTaskIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/parametres': typeof ParametresRoute
+  '/pipeline': typeof PipelineRoute
+  '/referentiel': typeof ReferentielRoute
+  '/squads': typeof SquadsRoute
+  '/demandes/nouvelle': typeof DemandesNouvelleRoute
+  '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
+  '/demandes/$id/processus': typeof DemandesIdProcessusRoute
+  '/demandes/$id': typeof DemandesIdIndexRoute
+  '/demandes/$id/taches/$taskId': typeof DemandesIdTachesTaskIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/parametres': typeof ParametresRoute
+  '/pipeline': typeof PipelineRoute
+  '/referentiel': typeof ReferentielRoute
+  '/squads': typeof SquadsRoute
+  '/demandes/nouvelle': typeof DemandesNouvelleRoute
+  '/demandes/$id/livrables': typeof DemandesIdLivrablesRoute
+  '/demandes/$id/processus': typeof DemandesIdProcessusRoute
+  '/demandes/$id/': typeof DemandesIdIndexRoute
+  '/demandes/$id/taches/$taskId': typeof DemandesIdTachesTaskIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/parametres'
+    | '/pipeline'
+    | '/referentiel'
+    | '/squads'
+    | '/demandes/nouvelle'
+    | '/demandes/$id/livrables'
+    | '/demandes/$id/processus'
+    | '/demandes/$id/'
+    | '/demandes/$id/taches/$taskId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/parametres'
+    | '/pipeline'
+    | '/referentiel'
+    | '/squads'
+    | '/demandes/nouvelle'
+    | '/demandes/$id/livrables'
+    | '/demandes/$id/processus'
+    | '/demandes/$id'
+    | '/demandes/$id/taches/$taskId'
+  id:
+    | '__root__'
+    | '/'
+    | '/parametres'
+    | '/pipeline'
+    | '/referentiel'
+    | '/squads'
+    | '/demandes/nouvelle'
+    | '/demandes/$id/livrables'
+    | '/demandes/$id/processus'
+    | '/demandes/$id/'
+    | '/demandes/$id/taches/$taskId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ParametresRoute: typeof ParametresRoute
+  PipelineRoute: typeof PipelineRoute
+  ReferentielRoute: typeof ReferentielRoute
+  SquadsRoute: typeof SquadsRoute
+  DemandesNouvelleRoute: typeof DemandesNouvelleRoute
+  DemandesIdLivrablesRoute: typeof DemandesIdLivrablesRoute
+  DemandesIdProcessusRoute: typeof DemandesIdProcessusRoute
+  DemandesIdIndexRoute: typeof DemandesIdIndexRoute
+  DemandesIdTachesTaskIdRoute: typeof DemandesIdTachesTaskIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parametres': {
+      id: '/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pipeline': {
+      id: '/pipeline'
+      path: '/pipeline'
+      fullPath: '/pipeline'
+      preLoaderRoute: typeof PipelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referentiel': {
+      id: '/referentiel'
+      path: '/referentiel'
+      fullPath: '/referentiel'
+      preLoaderRoute: typeof ReferentielRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squads': {
+      id: '/squads'
+      path: '/squads'
+      fullPath: '/squads'
+      preLoaderRoute: typeof SquadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demandes/nouvelle': {
+      id: '/demandes/nouvelle'
+      path: '/demandes/nouvelle'
+      fullPath: '/demandes/nouvelle'
+      preLoaderRoute: typeof DemandesNouvelleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demandes/$id/': {
+      id: '/demandes/$id/'
+      path: '/demandes/$id'
+      fullPath: '/demandes/$id/'
+      preLoaderRoute: typeof DemandesIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demandes/$id/livrables': {
+      id: '/demandes/$id/livrables'
+      path: '/demandes/$id/livrables'
+      fullPath: '/demandes/$id/livrables'
+      preLoaderRoute: typeof DemandesIdLivrablesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demandes/$id/processus': {
+      id: '/demandes/$id/processus'
+      path: '/demandes/$id/processus'
+      fullPath: '/demandes/$id/processus'
+      preLoaderRoute: typeof DemandesIdProcessusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demandes/$id/taches/$taskId': {
+      id: '/demandes/$id/taches/$taskId'
+      path: '/demandes/$id/taches/$taskId'
+      fullPath: '/demandes/$id/taches/$taskId'
+      preLoaderRoute: typeof DemandesIdTachesTaskIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ParametresRoute: ParametresRoute,
+  PipelineRoute: PipelineRoute,
+  ReferentielRoute: ReferentielRoute,
+  SquadsRoute: SquadsRoute,
+  DemandesNouvelleRoute: DemandesNouvelleRoute,
+  DemandesIdLivrablesRoute: DemandesIdLivrablesRoute,
+  DemandesIdProcessusRoute: DemandesIdProcessusRoute,
+  DemandesIdIndexRoute: DemandesIdIndexRoute,
+  DemandesIdTachesTaskIdRoute: DemandesIdTachesTaskIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
