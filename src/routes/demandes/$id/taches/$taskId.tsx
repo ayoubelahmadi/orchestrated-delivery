@@ -172,7 +172,7 @@ function TacheDetail() {
           </div>
 
           {livrable && (
-            <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="panel">
+            <motion.section initial={false} animate={{ opacity: 1 }} className="panel">
               <div className="flex items-center gap-2 border-b px-5 py-3.5">
                 <FileText className="text-primary size-4" />
                 <span className="text-sm font-medium">{livrable.name}</span>

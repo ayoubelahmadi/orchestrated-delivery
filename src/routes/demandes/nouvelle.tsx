@@ -216,7 +216,7 @@ function NouvelleDemande() {
         </section>
 
         <motion.aside
-          initial={{ opacity: 0, y: 8 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="panel h-fit p-6"
         >
