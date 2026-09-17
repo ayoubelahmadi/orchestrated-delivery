@@ -10,33 +10,74 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as ReferentielRouteImport } from './routes/referentiel'
+import { Route as SquadsRouteImport } from './routes/squads'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParametresRoute = ParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PipelineRoute = PipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferentielRoute = ReferentielRouteImport.update({
+  id: '/referentiel',
+  path: '/referentiel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SquadsRoute = SquadsRouteImport.update({
+  id: '/squads',
+  path: '/squads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/parametres': typeof ParametresRoute
+  '/pipeline': typeof PipelineRoute
+  '/referentiel': typeof ReferentielRoute
+  '/squads': typeof SquadsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/parametres': typeof ParametresRoute
+  '/pipeline': typeof PipelineRoute
+  '/referentiel': typeof ReferentielRoute
+  '/squads': typeof SquadsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/parametres': typeof ParametresRoute
+  '/pipeline': typeof PipelineRoute
+  '/referentiel': typeof ReferentielRoute
+  '/squads': typeof SquadsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/parametres' | '/pipeline' | '/referentiel' | '/squads'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/parametres' | '/pipeline' | '/referentiel' | '/squads'
+  id:
+    '__root__' | '/' | '/parametres' | '/pipeline' | '/referentiel' | '/squads'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ParametresRoute: typeof ParametresRoute
+  PipelineRoute: typeof PipelineRoute
+  ReferentielRoute: typeof ReferentielRoute
+  SquadsRoute: typeof SquadsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +89,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parametres': {
+      id: '/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pipeline': {
+      id: '/pipeline'
+      path: '/pipeline'
+      fullPath: '/pipeline'
+      preLoaderRoute: typeof PipelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referentiel': {
+      id: '/referentiel'
+      path: '/referentiel'
+      fullPath: '/referentiel'
+      preLoaderRoute: typeof ReferentielRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squads': {
+      id: '/squads'
+      path: '/squads'
+      fullPath: '/squads'
+      preLoaderRoute: typeof SquadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ParametresRoute: ParametresRoute,
+  PipelineRoute: PipelineRoute,
+  ReferentielRoute: ReferentielRoute,
+  SquadsRoute: SquadsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
