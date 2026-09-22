@@ -274,7 +274,9 @@ function NouvelleDemande() {
   const missingCount = Number(!infoComplete) + Number(!squadComplete);
   const availableRoles = ALL_ROLES.filter((role) => !squad.some((slot) => slot.role === role));
   const visibleRoles = availableRoles.filter((role) =>
-    ROLE_LABELS[role].toLocaleLowerCase(locale).includes(roleSearch.trim().toLocaleLowerCase(locale)),
+    ROLE_LABELS[role]
+      .toLocaleLowerCase(locale)
+      .includes(roleSearch.trim().toLocaleLowerCase(locale)),
   );
   const processStages =
     process === "Standard"
@@ -737,9 +739,15 @@ function NouvelleDemande() {
 
           <footer className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky bottom-0 z-20 mt-10 flex flex-col gap-3 border-t py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-              <ReadyItem done={infoComplete} label={infoComplete ? t.infoComplete : t.infoIncomplete} />
+              <ReadyItem
+                done={infoComplete}
+                label={infoComplete ? t.infoComplete : t.infoIncomplete}
+              />
               <ReadyItem done={false} label={t.resourcesOptional} muted />
-              <ReadyItem done={squadComplete} label={squadComplete ? t.squadReady : t.squadIncomplete} />
+              <ReadyItem
+                done={squadComplete}
+                label={squadComplete ? t.squadReady : t.squadIncomplete}
+              />
             </div>
             <div className="flex shrink-0 justify-end gap-2">
               <Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>
