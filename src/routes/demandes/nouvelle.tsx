@@ -141,13 +141,19 @@ const UI = {
     missingOne: "1 information requise",
     missingMany: "informations requises",
     infoComplete: "Besoin renseigné",
+    infoIncomplete: "Besoin à compléter",
     resourcesOptional: "Ressources optionnelles",
     squadReady: "Squad prête",
+    squadIncomplete: "Squad à configurer",
     create: "Créer la demande",
     cancel: "Annuler",
     fileError: "Ce fichier dépasse 20 Mo.",
     roles: "rôles",
     noRole: "Commencez par ajouter un rôle à la squad.",
+    searchRole: "Rechercher un rôle",
+    noMatchingRole: "Aucun rôle disponible",
+    proposalApplied: "La proposition a été appliquée. Vous gardez la main sur chaque rôle.",
+    aiBadge: "IA",
   },
   en: {
     title: "New request",
@@ -207,13 +213,19 @@ const UI = {
     missingOne: "1 required item",
     missingMany: "required items",
     infoComplete: "Need complete",
+    infoIncomplete: "Need incomplete",
     resourcesOptional: "Resources optional",
     squadReady: "Squad ready",
+    squadIncomplete: "Squad to configure",
     create: "Create request",
     cancel: "Cancel",
     fileError: "This file is larger than 20 MB.",
     roles: "roles",
     noRole: "Start by adding a role to the squad.",
+    searchRole: "Search roles",
+    noMatchingRole: "No role available",
+    proposalApplied: "The proposal has been applied. You remain in control of every role.",
+    aiBadge: "AI",
   },
 } as const;
 
@@ -232,6 +244,8 @@ function NouvelleDemande() {
   const locale = useUiLocale();
   const t = UI[locale];
   const fileInput = useRef<HTMLInputElement | null>(null);
+  const titleInput = useRef<HTMLInputElement | null>(null);
+  const descriptionInput = useRef<HTMLTextAreaElement | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<ProjectType>("Power Platform");
@@ -244,6 +258,7 @@ function NouvelleDemande() {
   const [aiProposed, setAiProposed] = useState(false);
   const [squad, setSquad] = useState<SquadSlot[]>([]);
   const [addRoleOpen, setAddRoleOpen] = useState(false);
+  const [roleSearch, setRoleSearch] = useState("");
 
   const proposal = useMemo<SquadSlot[]>(() => {
     const roles = process === "Standard" ? ROLES_STANDARD : ROLES_COURT;
@@ -260,6 +275,11 @@ function NouvelleDemande() {
   const canSubmit = infoComplete && squadComplete;
   const missingCount = Number(!infoComplete) + Number(!squadComplete);
   const availableRoles = ALL_ROLES.filter((role) => !squad.some((slot) => slot.role === role));
+  const visibleRoles = availableRoles.filter((role) =>
+    ROLE_LABELS[role]
+      .toLocaleLowerCase(locale)
+      .includes(roleSearch.trim().toLocaleLowerCase(locale)),
+  );
   const processStages =
     process === "Standard"
       ? "Intake → Analysis → Design → Dev → Run"
@@ -293,6 +313,7 @@ function NouvelleDemande() {
     ]);
     setAiProposed(false);
     setAddRoleOpen(false);
+    setRoleSearch("");
   };
 
   return (
@@ -353,6 +374,7 @@ function NouvelleDemande() {
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="title">{t.titleLabel}</RequiredLabel>
                     <Input
+                      ref={titleInput}
                       id="title"
                       value={title}
                       onChange={(event) => setTitle(event.target.value)}
@@ -363,6 +385,7 @@ function NouvelleDemande() {
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="description">{t.description}</RequiredLabel>
                     <Textarea
+                      ref={descriptionInput}
                       id="description"
                       value={description}
                       onChange={(event) => setDescription(event.target.value)}
@@ -530,10 +553,10 @@ function NouvelleDemande() {
                     <h2 className="text-base font-semibold">{t.squadTitle}</h2>
                     <p className="text-muted-foreground mt-0.5 text-xs">{t.squadHelp}</p>
                   </div>
-                  {aiProposed && (
+                  {mode === "ai" && aiProposed && (
                     <Pill tone="success">
                       <Check className="size-3" />
-                      IA
+                      {t.aiBadge}
                     </Pill>
                   )}
                 </div>
@@ -570,7 +593,7 @@ function NouvelleDemande() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-sm font-semibold">Factory Manager</p>
-                        {aiProposed && (
+                        {mode === "ai" && aiProposed && (
                           <span className="text-success text-[11px] font-medium">{t.proposed}</span>
                         )}
                       </div>
@@ -622,7 +645,7 @@ function NouvelleDemande() {
                   <div className="px-5 py-4">
                     <div className="mb-2 flex items-center justify-between">
                       <p className="text-sm font-semibold">
-                        {aiProposed ? t.proposed : t.configured}
+                        {mode === "ai" && aiProposed ? t.proposed : t.configured}
                       </p>
                       <span className="text-muted-foreground text-xs">
                         {squad.length} {t.roles}
@@ -657,29 +680,55 @@ function NouvelleDemande() {
                       </div>
                     )}
                     {availableRoles.length > 0 && (
-                      <Popover open={addRoleOpen} onOpenChange={setAddRoleOpen}>
+                      <Popover
+                        open={addRoleOpen}
+                        onOpenChange={(open) => {
+                          setAddRoleOpen(open);
+                          if (!open) setRoleSearch("");
+                        }}
+                      >
                         <PopoverTrigger asChild>
                           <Button type="button" variant="ghost" size="sm" className="mt-3">
                             <Plus />
                             {t.addRole}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent align="start" className="w-64 p-2">
+                        <PopoverContent
+                          align="start"
+                          side="top"
+                          sideOffset={8}
+                          className="w-72 p-2"
+                        >
                           <p className="text-muted-foreground px-2 pb-2 pt-1 text-xs">
                             {t.selectRole}
                           </p>
-                          <div className="space-y-0.5">
-                            {availableRoles.map((role) => (
-                              <Button
-                                key={role}
-                                type="button"
-                                variant="ghost"
-                                className="w-full justify-start"
-                                onClick={() => addRole(role)}
-                              >
-                                {ROLE_LABELS[role]}
-                              </Button>
-                            ))}
+                          {availableRoles.length > 5 && (
+                            <Input
+                              value={roleSearch}
+                              onChange={(event) => setRoleSearch(event.target.value)}
+                              placeholder={t.searchRole}
+                              aria-label={t.searchRole}
+                              className="mb-2 h-9"
+                            />
+                          )}
+                          <div className="max-h-64 space-y-0.5 overflow-y-auto">
+                            {visibleRoles.length ? (
+                              visibleRoles.map((role) => (
+                                <Button
+                                  key={role}
+                                  type="button"
+                                  variant="ghost"
+                                  className="w-full justify-start"
+                                  onClick={() => addRole(role)}
+                                >
+                                  {ROLE_LABELS[role]}
+                                </Button>
+                              ))
+                            ) : (
+                              <p className="text-muted-foreground px-2 py-3 text-xs">
+                                {t.noMatchingRole}
+                              </p>
+                            )}
                           </div>
                         </PopoverContent>
                       </Popover>
@@ -692,9 +741,15 @@ function NouvelleDemande() {
 
           <footer className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky bottom-0 z-20 mt-10 flex flex-col gap-3 border-t py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-              <ReadyItem done={infoComplete} label={t.infoComplete} />
-              <ReadyItem done label={t.resourcesOptional} muted />
-              <ReadyItem done={squadComplete} label={t.squadReady} />
+              <ReadyItem
+                done={infoComplete}
+                label={infoComplete ? t.infoComplete : t.infoIncomplete}
+              />
+              <ReadyItem done={false} label={t.resourcesOptional} muted />
+              <ReadyItem
+                done={squadComplete}
+                label={squadComplete ? t.squadReady : t.squadIncomplete}
+              />
             </div>
             <div className="flex shrink-0 justify-end gap-2">
               <Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>
@@ -718,6 +773,12 @@ function NouvelleDemande() {
         onApplyProposal={(slots) => {
           setSquad(slots);
           setAiProposed(true);
+          toast.success(t.proposalApplied);
+        }}
+        onCompleteRequest={() => {
+          const target = title.trim().length <= 2 ? titleInput.current : descriptionInput.current;
+          target?.scrollIntoView({ behavior: "smooth", block: "center" });
+          window.setTimeout(() => target?.focus(), 240);
         }}
       />
     </>
