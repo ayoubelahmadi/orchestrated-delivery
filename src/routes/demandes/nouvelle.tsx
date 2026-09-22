@@ -141,13 +141,18 @@ const UI = {
     missingOne: "1 information requise",
     missingMany: "informations requises",
     infoComplete: "Besoin renseigné",
+    infoIncomplete: "Besoin à compléter",
     resourcesOptional: "Ressources optionnelles",
     squadReady: "Squad prête",
+    squadIncomplete: "Squad à configurer",
     create: "Créer la demande",
     cancel: "Annuler",
     fileError: "Ce fichier dépasse 20 Mo.",
     roles: "rôles",
     noRole: "Commencez par ajouter un rôle à la squad.",
+    searchRole: "Rechercher un rôle",
+    noMatchingRole: "Aucun rôle disponible",
+    proposalApplied: "La proposition a été appliquée. Vous gardez la main sur chaque rôle.",
   },
   en: {
     title: "New request",
@@ -207,13 +212,18 @@ const UI = {
     missingOne: "1 required item",
     missingMany: "required items",
     infoComplete: "Need complete",
+    infoIncomplete: "Need incomplete",
     resourcesOptional: "Resources optional",
     squadReady: "Squad ready",
+    squadIncomplete: "Squad to configure",
     create: "Create request",
     cancel: "Cancel",
     fileError: "This file is larger than 20 MB.",
     roles: "roles",
     noRole: "Start by adding a role to the squad.",
+    searchRole: "Search roles",
+    noMatchingRole: "No role available",
+    proposalApplied: "The proposal has been applied. You remain in control of every role.",
   },
 } as const;
 
@@ -232,6 +242,8 @@ function NouvelleDemande() {
   const locale = useUiLocale();
   const t = UI[locale];
   const fileInput = useRef<HTMLInputElement | null>(null);
+  const titleInput = useRef<HTMLInputElement | null>(null);
+  const descriptionInput = useRef<HTMLTextAreaElement | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<ProjectType>("Power Platform");
@@ -244,6 +256,7 @@ function NouvelleDemande() {
   const [aiProposed, setAiProposed] = useState(false);
   const [squad, setSquad] = useState<SquadSlot[]>([]);
   const [addRoleOpen, setAddRoleOpen] = useState(false);
+  const [roleSearch, setRoleSearch] = useState("");
 
   const proposal = useMemo<SquadSlot[]>(() => {
     const roles = process === "Standard" ? ROLES_STANDARD : ROLES_COURT;
@@ -260,6 +273,9 @@ function NouvelleDemande() {
   const canSubmit = infoComplete && squadComplete;
   const missingCount = Number(!infoComplete) + Number(!squadComplete);
   const availableRoles = ALL_ROLES.filter((role) => !squad.some((slot) => slot.role === role));
+  const visibleRoles = availableRoles.filter((role) =>
+    ROLE_LABELS[role].toLocaleLowerCase(locale).includes(roleSearch.trim().toLocaleLowerCase(locale)),
+  );
   const processStages =
     process === "Standard"
       ? "Intake → Analysis → Design → Dev → Run"
