@@ -6,3 +6,12 @@
 - [x] Introduire l’état IA vide avant génération et renforcer Factory Manager
 - [x] Simplifier la barre de validation finale
 - [x] Vérifier les interactions desktop/mobile et les modes clair/sombre
+
+## V2.1 — Raffinement UX
+
+- [ ] Rendre l’application de la proposition IA explicitement humaine
+- [ ] Prioriser les informations essentielles avant les questions contextuelles
+- [ ] Harmoniser les modes IA/manuel et leurs libellés
+- [ ] Synchroniser les indicateurs de préparation supérieur et inférieur
+- [ ] Polir l’ajout de rôle et l’en-tête Factory Manager
+- [ ] Vérifier les parcours desktop/mobile et clair/sombre
