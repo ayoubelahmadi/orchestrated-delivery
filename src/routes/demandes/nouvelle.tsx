@@ -522,7 +522,7 @@ function NouvelleDemande() {
               </section>
             </div>
 
-            <aside className="panel min-w-0 overflow-hidden lg:sticky lg:top-5 lg:min-h-[640px]">
+            <aside className="panel min-w-0 overflow-hidden lg:sticky lg:top-5">
               <div className="border-b px-5 py-4">
                 <p className="eyebrow text-primary">03 · {t.squad}</p>
                 <div className="mt-1 flex items-start justify-between gap-3">
