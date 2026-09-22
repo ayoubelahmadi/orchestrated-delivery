@@ -472,7 +472,7 @@ function SquadRow({ slot, agents, people, copy, expandedByDefault, onChange, onR
   );
 }
 
-function AssignmentSelect({ label, icon, value, options, unassigned, onChange }: { label: string; icon: React.ReactNode; value?: string; options: { id: string; name: string }[]; unassigned: string; onChange: (value: string | undefined) => void }) {
+function AssignmentSelect({ label, icon, value, options, unassigned, onChange }: { label: string; icon: React.ReactNode; value: string | undefined; options: { id: string; name: string }[]; unassigned: string; onChange: (value: string | undefined) => void }) {
   return <div className="space-y-1.5"><Label className="flex items-center gap-1.5 text-xs">{icon}{label}</Label><Select value={value ?? "none"} onValueChange={(next) => onChange(next === "none" ? undefined : next)}><SelectTrigger aria-label={label}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="none">{unassigned}</SelectItem>{options.map((option) => <SelectItem key={option.id} value={option.id}>{option.name}</SelectItem>)}</SelectContent></Select></div>;
 }
 
