@@ -341,7 +341,7 @@ function NouvelleDemande() {
           }}
         >
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(390px,0.88fr)] xl:gap-12">
-            <div className="min-w-0 space-y-10">
+            <div className="min-w-0 space-y-8">
               <section>
                 <SectionHeading
                   number="01"
@@ -419,7 +419,7 @@ function NouvelleDemande() {
                 </div>
               </section>
 
-              <section className="border-t pt-8">
+              <section className="border-t pt-6">
                 <SectionHeading
                   number="02"
                   eyebrow={t.resources}
@@ -445,24 +445,33 @@ function NouvelleDemande() {
                       event.preventDefault();
                       addFiles(event.dataTransfer.files);
                     }}
-                    className="border-input hover:border-primary/50 mt-5 flex min-h-20 items-center gap-4 rounded-lg border border-dashed px-4 py-3.5 transition-colors"
+                    className="border-input hover:border-primary/50 mt-4 flex items-center gap-2.5 rounded-lg border border-dashed px-3 py-2 transition-colors"
                   >
-                    <span className="bg-muted text-primary grid size-9 shrink-0 place-items-center rounded-lg">
-                      <UploadCloud className="size-4" />
+                    <UploadCloud className="text-muted-foreground size-4 shrink-0" />
+                    <p className="text-muted-foreground min-w-0 truncate text-xs">
+                      {t.drop}{" "}
+                      <button
+                        type="button"
+                        className="text-primary underline-offset-4 hover:underline"
+                        onClick={() => fileInput.current?.click()}
+                      >
+                        {t.browse}
+                      </button>
+                    </p>
+                    <span className="text-border hidden shrink-0 sm:inline">·</span>
+                    <span className="text-muted-foreground hidden shrink-0 text-[11px] sm:inline">
+                      {t.formats}
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">
-                        {t.drop}{" "}
-                        <button
-                          type="button"
-                          className="text-primary underline-offset-4 hover:underline"
-                          onClick={() => fileInput.current?.click()}
-                        >
-                          {t.browse}
-                        </button>
-                      </p>
-                      <p className="text-muted-foreground mt-0.5 text-xs">{t.formats}</p>
-                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="ml-auto shrink-0"
+                      onClick={() => fileInput.current?.click()}
+                    >
+                      <Plus />
+                      {t.addFiles}
+                    </Button>
                   </div>
                 ) : (
                   <div className="mt-5 space-y-2">
@@ -513,7 +522,7 @@ function NouvelleDemande() {
               </section>
             </div>
 
-            <aside className="panel min-w-0 overflow-hidden lg:sticky lg:top-5">
+            <aside className="panel min-w-0 overflow-hidden lg:sticky lg:top-5 lg:min-h-[640px]">
               <div className="border-b px-5 py-4">
                 <p className="eyebrow text-primary">03 · {t.squad}</p>
                 <div className="mt-1 flex items-start justify-between gap-3">
