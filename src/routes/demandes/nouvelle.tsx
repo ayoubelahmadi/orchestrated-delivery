@@ -2,14 +2,17 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Bot,
   Check,
+  ChevronDown,
   ChevronRight,
   File,
   FileSpreadsheet,
   FileText,
+  Pencil,
   Plus,
   Trash2,
   UploadCloud,
   UserRound,
+  Users,
   Workflow,
   X,
 } from "lucide-react";
@@ -21,6 +24,7 @@ import { Pill } from "@/components/factory/bits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -47,14 +51,10 @@ export const Route = createFileRoute("/demandes/nouvelle")({
       { title: "Nouvelle demande — Factory" },
       {
         name: "description",
-        content:
-          "Créez une demande, ajoutez son contexte et composez sa squad avec Factory Manager.",
+        content: "Créez une demande, ajoutez son contexte et composez sa squad avec Factory Manager.",
       },
       { property: "og:title", content: "Nouvelle demande — Factory" },
-      {
-        property: "og:description",
-        content: "Espace de création de demande et de composition de squad.",
-      },
+      { property: "og:description", content: "Espace de création de demande et de composition de squad." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -62,30 +62,19 @@ export const Route = createFileRoute("/demandes/nouvelle")({
   component: NouvelleDemande,
 });
 
-const ALL_ROLES: RoleKey[] = [
-  "PO",
-  "PM",
-  "ANALYST",
-  "ARCHITECT",
-  "DESIGNER",
-  "DEV",
-  "QA",
-  "BRAINSTORMING",
-];
+const ALL_ROLES: RoleKey[] = ["PO", "PM", "ANALYST", "ARCHITECT", "DESIGNER", "DEV", "QA", "BRAINSTORMING"];
 const ROLES_STANDARD: RoleKey[] = ["PO", "PM", "ANALYST", "ARCHITECT", "DESIGNER", "DEV", "QA"];
 const ROLES_COURT: RoleKey[] = ["PO", "DESIGNER", "DEV", "QA"];
-
 type Resource = { id: string; name: string; size: number; type: string };
 type SquadMode = "ai" | "manual";
 
 const UI = {
   fr: {
     title: "Nouvelle demande",
-    intro:
-      "Cadrez le besoin, ajoutez vos documents de contexte et composez la squad qui le portera.",
-    need: "01 · Besoin",
+    intro: "Cadrez le besoin et composez l’équipe qui le portera.",
+    need: "Besoin",
     needTitle: "Informations de la demande",
-    needHelp: "Les champs marqués d’un astérisque sont nécessaires pour démarrer.",
+    needHelp: "Donnez à la Factory les éléments essentiels pour démarrer.",
     titleLabel: "Titre de la demande",
     titlePlaceholder: "Ex. Portail fournisseurs V1",
     description: "Description du besoin",
@@ -97,51 +86,60 @@ const UI = {
     process: "Process",
     standard: "Standard — 5 étapes",
     short: "Court — 4 étapes",
-    resources: "02 · Contexte",
+    standardDescription: "Parcours complet pour les demandes nécessitant cadrage, analyse et conception.",
+    shortDescription: "Parcours resserré pour les demandes déjà cadrées ou à délai court.",
+    resources: "Contexte",
     resourcesTitle: "Ressources de la demande",
     optional: "Optionnel",
-    resourcesHelp:
-      "Ajoutez des documents de contexte pour aider la Factory à mieux comprendre votre besoin.",
-    drop: "Déposez vos fichiers ici",
-    browse: "ou parcourir les fichiers",
-    formats: "PDF, DOCX, PPTX, XLSX · 20 Mo maximum",
+    resourcesHelp: "Ajoutez des documents pour aider la Factory à mieux comprendre votre besoin.",
+    drop: "Glissez vos documents ici ou",
+    browse: "parcourez les fichiers",
+    addFiles: "Ajouter des fichiers",
+    formats: "PDF, DOCX, PPTX, XLSX · 20 Mo max.",
     remove: "Supprimer",
-    squad: "03 · Équipe",
+    squad: "Squad workspace",
     squadTitle: "Composition de la squad",
-    squadHelp: "L’IA recommande. Vous validez et ajustez chaque rôle.",
+    squadHelp: "L’IA recommande. Vous gardez le dernier mot.",
     aiMode: "Assistée par l’IA",
     manualMode: "Manuelle",
     aiAction: "Construire ma squad avec l’IA",
-    aiReview: "Demander une optimisation",
-    aiCopy:
-      "Factory Manager analyse votre demande et propose la meilleure combinaison de personnes et d’agents IA.",
-    manualCopy:
-      "Composez directement votre squad. Vous pourrez demander une relecture à Factory Manager à tout moment.",
-    proposed: "Squad proposée par l’IA",
-    configured: "Squad configurée",
+    aiContinue: "Continuer avec Factory Manager",
+    aiReview: "Faire optimiser cette squad",
+    aiCopy: "Analyse votre demande, son process et ses ressources pour proposer la meilleure combinaison de personnes et d’agents.",
+    manualCopy: "Composez directement votre squad, rôle par rôle.",
+    waiting: "Aucune squad générée",
+    waitingHelp: "Lancez Factory Manager lorsque votre besoin est suffisamment renseigné.",
+    proposed: "Squad proposée",
+    configured: "Squad actuelle",
     agent: "Agent IA",
     person: "Personne",
     unassigned: "Non assigné",
     removeRole: "Retirer ce rôle",
+    editRole: "Modifier ce rôle",
     addRole: "Ajouter un rôle",
     selectRole: "Choisir un rôle",
+    requestContext: "Demande",
+    resourceContext: "Ressources",
+    complete: "Complet",
+    incomplete: "À compléter",
     ready: "Prête à créer",
-    notReady: "À compléter",
-    infoComplete: "Informations complètes",
-    infoMissing: "Informations à compléter",
-    resourcesOptional: "Ressources facultatives",
-    squadReady: "Squad configurée",
-    squadMissing: "Ajoutez au moins un rôle",
+    missingOne: "1 information requise",
+    missingMany: "informations requises",
+    infoComplete: "Besoin renseigné",
+    resourcesOptional: "Ressources optionnelles",
+    squadReady: "Squad prête",
     create: "Créer la demande",
     cancel: "Annuler",
     fileError: "Ce fichier dépasse 20 Mo.",
+    roles: "rôles",
+    noRole: "Commencez par ajouter un rôle à la squad.",
   },
   en: {
     title: "New request",
-    intro: "Frame the need, add context documents and compose the squad that will deliver it.",
-    need: "01 · Need",
+    intro: "Frame the need and compose the team that will deliver it.",
+    need: "Need",
     needTitle: "Request information",
-    needHelp: "Fields marked with an asterisk are required to get started.",
+    needHelp: "Give Factory the essential information it needs to get started.",
     titleLabel: "Request title",
     titlePlaceholder: "E.g. Supplier portal V1",
     description: "Need description",
@@ -152,44 +150,54 @@ const UI = {
     requester: "Requester",
     process: "Process",
     standard: "Standard — 5 stages",
-    short: "Short — 4 stages",
-    resources: "02 · Context",
+    short: "Court — 4 stages",
+    standardDescription: "Complete path for requests requiring framing, analysis and design.",
+    shortDescription: "Focused path for requests already framed or with a short deadline.",
+    resources: "Context",
     resourcesTitle: "Request resources",
     optional: "Optional",
-    resourcesHelp: "Add contextual documents to help Factory better understand your request.",
-    drop: "Drop your files here",
-    browse: "or browse files",
-    formats: "PDF, DOCX, PPTX, XLSX · 20 MB maximum",
+    resourcesHelp: "Add documents to help Factory better understand your request.",
+    drop: "Drop documents here or",
+    browse: "browse files",
+    addFiles: "Add files",
+    formats: "PDF, DOCX, PPTX, XLSX · 20 MB max.",
     remove: "Remove",
-    squad: "03 · Team",
+    squad: "Squad workspace",
     squadTitle: "Squad composition",
-    squadHelp: "AI recommends. You validate and adjust every role.",
+    squadHelp: "AI recommends. You keep the final say.",
     aiMode: "AI-assisted",
     manualMode: "Manual",
     aiAction: "Build my squad with AI",
-    aiReview: "Ask for optimisation",
-    aiCopy:
-      "Factory Manager analyses your request and suggests the best combination of people and AI agents.",
-    manualCopy:
-      "Compose your squad directly. You can ask Factory Manager for a review at any time.",
-    proposed: "AI-proposed squad",
-    configured: "Configured squad",
+    aiContinue: "Continue with Factory Manager",
+    aiReview: "Optimise this squad",
+    aiCopy: "Analyses your request, process and resources to suggest the best combination of people and agents.",
+    manualCopy: "Compose your squad directly, role by role.",
+    waiting: "No squad generated",
+    waitingHelp: "Launch Factory Manager when your request has enough detail.",
+    proposed: "Proposed squad",
+    configured: "Current squad",
     agent: "AI agent",
     person: "Person",
     unassigned: "Unassigned",
-    removeRole: "Remove this role",
+    removeRole: "Remove role",
+    editRole: "Edit role",
     addRole: "Add role",
     selectRole: "Choose a role",
+    requestContext: "Request",
+    resourceContext: "Resources",
+    complete: "Complete",
+    incomplete: "Incomplete",
     ready: "Ready to create",
-    notReady: "Incomplete",
-    infoComplete: "Information complete",
-    infoMissing: "Complete the information",
+    missingOne: "1 required item",
+    missingMany: "required items",
+    infoComplete: "Need complete",
     resourcesOptional: "Resources optional",
-    squadReady: "Squad configured",
-    squadMissing: "Add at least one role",
+    squadReady: "Squad ready",
     create: "Create request",
     cancel: "Cancel",
     fileError: "This file is larger than 20 MB.",
+    roles: "roles",
+    noRole: "Start by adding a role to the squad.",
   },
 } as const;
 
@@ -197,8 +205,7 @@ function useUiLocale() {
   const [locale, setLocale] = useState<"fr" | "en">("fr");
   useEffect(() => {
     const stored = localStorage.getItem("factory-locale");
-    const pageLanguage = document.documentElement.lang;
-    setLocale(stored === "en" || pageLanguage.startsWith("en") ? "en" : "fr");
+    setLocale(stored === "en" || document.documentElement.lang.startsWith("en") ? "en" : "fr");
   }, []);
   return locale;
 }
@@ -209,7 +216,6 @@ function NouvelleDemande() {
   const locale = useUiLocale();
   const t = UI[locale];
   const fileInput = useRef<HTMLInputElement | null>(null);
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<ProjectType>("Power Platform");
@@ -220,18 +226,8 @@ function NouvelleDemande() {
   const [mode, setMode] = useState<SquadMode>("ai");
   const [managerOpen, setManagerOpen] = useState(false);
   const [aiProposed, setAiProposed] = useState(false);
-  const [roleToAdd, setRoleToAdd] = useState<RoleKey | "">("");
-
-  const initialSquad = useMemo<SquadSlot[]>(
-    () =>
-      ROLES_STANDARD.map((role) => ({
-        role,
-        agentId: factory.agents.find((agent) => agent.role === role)?.id,
-        personId: factory.people.find((person) => person.role === role)?.id,
-      })),
-    [factory.agents, factory.people],
-  );
-  const [squad, setSquad] = useState<SquadSlot[]>(initialSquad);
+  const [squad, setSquad] = useState<SquadSlot[]>([]);
+  const [addRoleOpen, setAddRoleOpen] = useState(false);
 
   const proposal = useMemo<SquadSlot[]>(() => {
     const roles = process === "Standard" ? ROLES_STANDARD : ROLES_COURT;
@@ -242,15 +238,15 @@ function NouvelleDemande() {
     }));
   }, [process, factory.agents, factory.people]);
 
-  const infoComplete =
-    title.trim().length > 2 && description.trim().length > 10 && demandeur.trim().length > 1;
+  const infoComplete = title.trim().length > 2 && description.trim().length > 10 && demandeur.trim().length > 1;
   const squadComplete = squad.length > 0;
   const canSubmit = infoComplete && squadComplete;
+  const missingCount = Number(!infoComplete) + Number(!squadComplete);
   const availableRoles = ALL_ROLES.filter((role) => !squad.some((slot) => slot.role === role));
+  const processStages = process === "Standard" ? "Intake → Analysis → Design → Dev → Run" : "Intake → Design → Dev → Run";
 
   const addFiles = (files: FileList | File[]) => {
-    const incoming = Array.from(files);
-    const accepted = incoming.filter((file) => {
+    const accepted = Array.from(files).filter((file) => {
       if (file.size <= 20 * 1024 * 1024) return true;
       toast.error(t.fileError, { description: file.name });
       return false;
@@ -266,544 +262,222 @@ function NouvelleDemande() {
     ]);
   };
 
-  const updateSlot = (role: RoleKey, patch: Partial<SquadSlot>) => {
-    setSquad((current) =>
-      current.map((slot) => (slot.role === role ? { ...slot, ...patch } : slot)),
-    );
+  const addRole = (role: RoleKey) => {
+    setSquad((current) => [
+      ...current,
+      {
+        role,
+        agentId: factory.agents.find((agent) => agent.role === role)?.id,
+        personId: factory.people.find((person) => person.role === role)?.id,
+      },
+    ]);
     setAiProposed(false);
+    setAddRoleOpen(false);
   };
 
   return (
     <>
-      <main className="mx-auto w-full max-w-[1120px] px-4 py-6 sm:px-8 sm:py-8">
-        <header className="mb-7 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="eyebrow">Factory</p>
-            <h1 className="mt-1 text-3xl font-semibold">{t.title}</h1>
-            <p className="text-muted-foreground mt-2 max-w-2xl text-sm">{t.intro}</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <ReadinessDot done={infoComplete} label={t.needTitle} />
-            <ChevronRight className="text-muted-foreground size-3.5" />
-            <ReadinessDot done={squadComplete} label={t.squadTitle} />
+      <main className="mx-auto w-full max-w-[1280px] px-4 pb-24 pt-5 sm:px-7 sm:pt-7">
+        <header className="mb-7 border-b pb-5">
+          <p className="eyebrow">Factory / {t.need}</p>
+          <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+            <div className="min-w-0">
+              <h1 className="truncate text-2xl font-semibold sm:text-3xl">{t.title}</h1>
+              <p className="text-muted-foreground mt-1.5 text-sm">{t.intro}</p>
+            </div>
+            <span className={cn("hidden items-center gap-2 text-xs sm:flex", canSubmit ? "text-success" : "text-muted-foreground")}>
+              <span className={cn("size-2 rounded-full", canSubmit ? "bg-success" : "bg-muted-foreground/40")} />
+              {canSubmit ? t.ready : `${missingCount} ${missingCount === 1 ? t.missingOne.replace("1 ", "") : t.missingMany}`}
+            </span>
           </div>
         </header>
 
         <form
-          className="space-y-5"
           onSubmit={(event) => {
             event.preventDefault();
             if (!canSubmit) return;
-            const id = factory.createDemande({
-              title: title.trim(),
-              description: description.trim(),
-              type,
-              process,
-              demandeur,
-              priority,
-              squad,
-            });
+            const id = factory.createDemande({ title: title.trim(), description: description.trim(), type, process, demandeur, priority, squad });
             navigate({ to: "/demandes/$id", params: { id } });
           }}
         >
-          <section className="panel overflow-hidden">
-            <SectionHeader eyebrow={t.need} title={t.needTitle} help={t.needHelp} />
-            <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-2">
-              <div className="space-y-2 lg:col-span-2">
-                <RequiredLabel htmlFor="title">{t.titleLabel}</RequiredLabel>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder={t.titlePlaceholder}
-                  required
-                />
-              </div>
-              <div className="space-y-2 lg:col-span-2">
-                <RequiredLabel htmlFor="description">{t.description}</RequiredLabel>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  placeholder={t.descriptionPlaceholder}
-                  className="min-h-28 resize-y"
-                  required
-                />
-                <p className="text-muted-foreground text-xs">{t.descriptionHelp}</p>
-              </div>
-              <SelectField
-                label={t.projectType}
-                value={type}
-                onChange={(value) => setType(value as ProjectType)}
-                options={["Power Platform", "RPA", "Fullstack"]}
-              />
-              <SelectField
-                label={t.priority}
-                value={priority}
-                onChange={(value) => setPriority(value as Priority)}
-                options={["Basse", "Normale", "Haute", "Critique"]}
-              />
-              <div className="space-y-2 lg:col-span-2">
-                <RequiredLabel htmlFor="demandeur">{t.requester}</RequiredLabel>
-                <Input
-                  id="demandeur"
-                  value={demandeur}
-                  onChange={(event) => setDemandeur(event.target.value)}
-                  required
-                />
-              </div>
-              <fieldset className="space-y-3 lg:col-span-2">
-                <legend className="text-sm font-medium">
-                  {t.process} <span className="text-primary">*</span>
-                </legend>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {(["Standard", "Court"] as ProcessKind[]).map((item) => (
-                    <Button
-                      key={item}
-                      type="button"
-                      variant="outline"
-                      onClick={() => setProcess(item)}
-                      aria-pressed={process === item}
-                      className={cn(
-                        "h-auto justify-start px-4 py-3 text-left",
-                        process === item && "border-primary bg-primary/5 ring-1 ring-primary/20",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "grid size-4 place-items-center rounded-full border",
-                          process === item && "border-primary",
-                        )}
-                      >
-                        {process === item && <span className="bg-primary size-2 rounded-full" />}
-                      </span>
-                      <span>
-                        <span className="block text-sm font-semibold">
-                          {item === "Standard" ? t.standard : t.short}
-                        </span>
-                        <span className="text-muted-foreground mt-0.5 block text-xs font-normal">
-                          {item === "Standard"
-                            ? "Intake → Analysis → Design → Dev → Run"
-                            : "Intake → Design → Dev → Run"}
-                        </span>
-                      </span>
-                    </Button>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-          </section>
-
-          <section className="panel overflow-hidden">
-            <SectionHeader
-              eyebrow={t.resources}
-              title={t.resourcesTitle}
-              help={t.resourcesHelp}
-              trailing={<Pill tone="neutral">{t.optional}</Pill>}
-            />
-            <div className="p-5 sm:p-6">
-              <div
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event: DragEvent<HTMLDivElement>) => {
-                  event.preventDefault();
-                  addFiles(event.dataTransfer.files);
-                }}
-                className="border-input bg-muted/20 hover:border-primary/50 hover:bg-primary/3 flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed px-5 py-6 text-center transition-colors"
-              >
-                <UploadCloud className="text-primary mb-2 size-6" />
-                <p className="text-sm font-medium">{t.drop}</p>
-                <Button
-                  type="button"
-                  variant="link"
-                  className="h-auto px-1 py-1"
-                  onClick={() => fileInput.current?.click()}
-                >
-                  {t.browse}
-                </Button>
-                <p className="text-muted-foreground text-xs">{t.formats}</p>
-                <input
-                  ref={fileInput}
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
-                  className="sr-only"
-                  onChange={(event) => {
-                    if (event.target.files) addFiles(event.target.files);
-                    event.target.value = "";
-                  }}
-                />
-              </div>
-              {resources.length > 0 && (
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {resources.map((resource) => (
-                    <div
-                      key={resource.id}
-                      className="flex min-w-0 items-center gap-3 rounded-lg border px-3 py-2.5"
-                    >
-                      <span className="bg-muted text-muted-foreground grid size-9 shrink-0 place-items-center rounded-lg">
-                        <ResourceIcon type={resource.type} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium">{resource.name}</span>
-                        <span className="text-muted-foreground text-xs">
-                          {resource.type} · {formatSize(resource.size)}
-                        </span>
-                      </span>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() =>
-                                setResources((items) =>
-                                  items.filter((item) => item.id !== resource.id),
-                                )
-                              }
-                            >
-                              <Trash2 />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>{t.remove}</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+          <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(390px,0.88fr)] xl:gap-12">
+            <div className="min-w-0 space-y-10">
+              <section>
+                <SectionHeading number="01" eyebrow={t.need} title={t.needTitle} help={t.needHelp} />
+                <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2 sm:col-span-2">
+                    <RequiredLabel htmlFor="title">{t.titleLabel}</RequiredLabel>
+                    <Input id="title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t.titlePlaceholder} required />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <RequiredLabel htmlFor="description">{t.description}</RequiredLabel>
+                    <Textarea id="description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder={t.descriptionPlaceholder} className="min-h-28 resize-y" required />
+                    <p className="text-muted-foreground text-xs">{t.descriptionHelp}</p>
+                  </div>
+                  <SelectField label={t.projectType} value={type} onChange={(value) => setType(value as ProjectType)} options={["Power Platform", "RPA", "Fullstack"]} />
+                  <SelectField label={t.priority} value={priority} onChange={(value) => setPriority(value as Priority)} options={["Basse", "Normale", "Haute", "Critique"]} />
+                  <div className="space-y-2 sm:col-span-2">
+                    <RequiredLabel htmlFor="demandeur">{t.requester}</RequiredLabel>
+                    <Input id="demandeur" value={demandeur} onChange={(event) => setDemandeur(event.target.value)} required />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label>{t.process} <span className="text-primary">*</span></Label>
+                    <Select value={process} onValueChange={(value) => setProcess(value as ProcessKind)}>
+                      <SelectTrigger aria-label={t.process}><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Standard">{t.standard}</SelectItem>
+                        <SelectItem value="Court">{t.short}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="bg-muted/45 rounded-lg px-3.5 py-3">
+                      <p className="text-xs leading-relaxed">{process === "Standard" ? t.standardDescription : t.shortDescription}</p>
+                      <p className="text-muted-foreground mt-1.5 text-[11px]">{processStages}</p>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
-            </div>
-          </section>
+              </section>
 
-          <section className="panel overflow-hidden">
-            <SectionHeader eyebrow={t.squad} title={t.squadTitle} help={t.squadHelp} />
-            <div className="border-b px-5 py-4 sm:px-6">
-              <div className="bg-muted inline-flex rounded-lg p-1">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={mode === "ai" ? "secondary" : "ghost"}
-                  className={cn(mode === "ai" && "bg-background shadow-sm")}
-                  onClick={() => setMode("ai")}
-                >
-                  <Workflow />
-                  {t.aiMode}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={mode === "manual" ? "secondary" : "ghost"}
-                  className={cn(mode === "manual" && "bg-background shadow-sm")}
-                  onClick={() => setMode("manual")}
-                >
-                  <UserRound />
-                  {t.manualMode}
-                </Button>
-              </div>
-              <div className="mt-4 flex flex-col gap-4 rounded-xl border bg-muted/20 p-4 sm:flex-row sm:items-center">
-                <span className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-xl">
-                  <Workflow className="size-5" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">Factory Manager</p>
-                  <p className="text-muted-foreground mt-0.5 text-xs leading-relaxed">
-                    {mode === "ai" ? t.aiCopy : t.manualCopy}
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant={mode === "ai" ? "default" : "outline"}
-                  onClick={() => setManagerOpen(true)}
-                  className="shrink-0"
-                >
-                  {mode === "ai" ? t.aiAction : t.aiReview}
-                </Button>
-              </div>
-            </div>
-
-            <div className="p-5 sm:p-6">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold">{aiProposed ? t.proposed : t.configured}</p>
-                  <p className="text-muted-foreground mt-0.5 text-xs">
-                    {squad.length} {locale === "fr" ? "rôles" : "roles"}
-                  </p>
-                </div>
-                {aiProposed && (
-                  <Pill tone="success">
-                    <Check className="size-3" /> IA
-                  </Pill>
+              <section className="border-t pt-8">
+                <SectionHeading number="02" eyebrow={t.resources} title={t.resourcesTitle} help={t.resourcesHelp} trailing={<Pill tone="neutral">{t.optional}</Pill>} />
+                <input ref={fileInput} type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" className="sr-only" onChange={(event) => { if (event.target.files) addFiles(event.target.files); event.target.value = ""; }} />
+                {resources.length === 0 ? (
+                  <div
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event: DragEvent<HTMLDivElement>) => { event.preventDefault(); addFiles(event.dataTransfer.files); }}
+                    className="border-input hover:border-primary/50 mt-5 flex min-h-20 items-center gap-4 rounded-lg border border-dashed px-4 py-3.5 transition-colors"
+                  >
+                    <span className="bg-muted text-primary grid size-9 shrink-0 place-items-center rounded-lg"><UploadCloud className="size-4" /></span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{t.drop} <button type="button" className="text-primary underline-offset-4 hover:underline" onClick={() => fileInput.current?.click()}>{t.browse}</button></p>
+                      <p className="text-muted-foreground mt-0.5 text-xs">{t.formats}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-5 space-y-2">
+                    {resources.map((resource) => (
+                      <div key={resource.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b py-2.5">
+                        <span className="bg-muted text-muted-foreground grid size-8 shrink-0 place-items-center rounded-md"><ResourceIcon type={resource.type} /></span>
+                        <span className="min-w-0"><span className="block truncate text-sm font-medium">{resource.name}</span><span className="text-muted-foreground text-xs">{resource.type} · {formatSize(resource.size)}</span></span>
+                        <IconTooltip label={t.remove}><Button type="button" variant="ghost" size="icon-sm" onClick={() => setResources((items) => items.filter((item) => item.id !== resource.id))}><Trash2 /></Button></IconTooltip>
+                      </div>
+                    ))}
+                    <Button type="button" variant="ghost" size="sm" className="mt-1" onClick={() => fileInput.current?.click()}><Plus />{t.addFiles}</Button>
+                  </div>
                 )}
+              </section>
+            </div>
+
+            <aside className="panel min-w-0 overflow-hidden lg:sticky lg:top-5">
+              <div className="border-b px-5 py-4">
+                <p className="eyebrow text-primary">03 · {t.squad}</p>
+                <div className="mt-1 flex items-start justify-between gap-3">
+                  <div><h2 className="text-base font-semibold">{t.squadTitle}</h2><p className="text-muted-foreground mt-0.5 text-xs">{t.squadHelp}</p></div>
+                  {aiProposed && <Pill tone="success"><Check className="size-3" />IA</Pill>}
+                </div>
+                <div className="bg-muted mt-4 grid grid-cols-2 rounded-lg p-1">
+                  <Button type="button" size="sm" variant={mode === "ai" ? "secondary" : "ghost"} className={cn("w-full", mode === "ai" && "bg-background shadow-sm")} onClick={() => setMode("ai")}><Workflow />{t.aiMode}</Button>
+                  <Button type="button" size="sm" variant={mode === "manual" ? "secondary" : "ghost"} className={cn("w-full", mode === "manual" && "bg-background shadow-sm")} onClick={() => setMode("manual")}><UserRound />{t.manualMode}</Button>
+                </div>
               </div>
-              <div className="grid gap-3 lg:grid-cols-2">
-                {squad.map((slot) => (
-                  <SquadCard
-                    key={slot.role}
-                    slot={slot}
-                    agents={factory.agents}
-                    people={factory.people}
-                    copy={t}
-                    onChange={(patch) => updateSlot(slot.role, patch)}
-                    onRemove={() => {
-                      setSquad((items) => items.filter((item) => item.role !== slot.role));
-                      setAiProposed(false);
-                    }}
-                  />
-                ))}
-              </div>
-              {availableRoles.length > 0 && (
-                <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <Select
-                    value={roleToAdd}
-                    onValueChange={(value) => setRoleToAdd(value as RoleKey)}
-                  >
-                    <SelectTrigger className="w-full sm:w-64" aria-label={t.selectRole}>
-                      <SelectValue placeholder={t.selectRole} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableRoles.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {ROLE_LABELS[role]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={!roleToAdd}
-                    onClick={() => {
-                      if (!roleToAdd) return;
-                      setSquad((items) => [...items, { role: roleToAdd }]);
-                      setRoleToAdd("");
-                      setAiProposed(false);
-                    }}
-                  >
-                    <Plus />
-                    {t.addRole}
+
+              <div className="px-5 py-4">
+                <div className="bg-muted/40 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-lg"><Workflow className="size-4" /></span>
+                    <div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><p className="text-sm font-semibold">Factory Manager</p>{aiProposed && <span className="text-success text-[11px] font-medium">{t.proposed}</span>}</div><p className="text-muted-foreground mt-1 text-xs leading-relaxed">{mode === "ai" ? t.aiCopy : t.manualCopy}</p></div>
+                  </div>
+                  {mode === "ai" && !aiProposed && (
+                    <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-[11px]">
+                      <ContextState label={t.requestContext} value={infoComplete ? t.complete : t.incomplete} done={infoComplete} />
+                      <ContextState label={t.process} value={process} done />
+                      <ContextState label={t.resourceContext} value={String(resources.length)} done={resources.length > 0} neutral />
+                    </div>
+                  )}
+                  <Button type="button" variant={mode === "ai" && !aiProposed ? "default" : "outline"} className="mt-4 w-full" onClick={() => setManagerOpen(true)}>
+                    <Workflow />{mode === "manual" ? t.aiReview : aiProposed ? t.aiContinue : t.aiAction}
                   </Button>
                 </div>
-              )}
-            </div>
-          </section>
-
-          <footer className="panel flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-            <div>
-              <p className="flex items-center gap-2 text-sm font-semibold">
-                <span
-                  className={cn(
-                    "grid size-5 place-items-center rounded-full",
-                    canSubmit ? "bg-success/12 text-success" : "bg-muted text-muted-foreground",
-                  )}
-                >
-                  {canSubmit ? (
-                    <Check className="size-3.5" />
-                  ) : (
-                    <span className="size-1.5 rounded-full bg-current" />
-                  )}
-                </span>
-                {canSubmit ? t.ready : t.notReady}
-              </p>
-              <div className="text-muted-foreground mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                <span>{infoComplete ? t.infoComplete : t.infoMissing}</span>
-                <span>{t.resourcesOptional}</span>
-                <span>{squadComplete ? t.squadReady : t.squadMissing}</span>
               </div>
+
+              <div className="border-t">
+                {mode === "ai" && !aiProposed && squad.length === 0 ? (
+                  <div className="px-6 py-10 text-center">
+                    <span className="bg-muted text-muted-foreground mx-auto grid size-10 place-items-center rounded-full"><Users className="size-4" /></span>
+                    <p className="mt-3 text-sm font-medium">{t.waiting}</p>
+                    <p className="text-muted-foreground mx-auto mt-1 max-w-xs text-xs leading-relaxed">{t.waitingHelp}</p>
+                  </div>
+                ) : (
+                  <div className="px-5 py-4">
+                    <div className="mb-2 flex items-center justify-between"><p className="text-sm font-semibold">{aiProposed ? t.proposed : t.configured}</p><span className="text-muted-foreground text-xs">{squad.length} {t.roles}</span></div>
+                    {squad.length === 0 ? <p className="text-muted-foreground py-6 text-center text-xs">{t.noRole}</p> : (
+                      <div className="divide-y">
+                        {squad.map((slot) => (
+                          <SquadRow key={slot.role} slot={slot} agents={factory.agents} people={factory.people} copy={t} expandedByDefault={mode === "manual" && squad.length <= 2} onChange={(patch) => { setSquad((items) => items.map((item) => item.role === slot.role ? { ...item, ...patch } : item)); setAiProposed(false); }} onRemove={() => { setSquad((items) => items.filter((item) => item.role !== slot.role)); setAiProposed(false); }} />
+                        ))}
+                      </div>
+                    )}
+                    {availableRoles.length > 0 && (
+                      <Popover open={addRoleOpen} onOpenChange={setAddRoleOpen}>
+                        <PopoverTrigger asChild><Button type="button" variant="ghost" size="sm" className="mt-3"><Plus />{t.addRole}</Button></PopoverTrigger>
+                        <PopoverContent align="start" className="w-64 p-2">
+                          <p className="text-muted-foreground px-2 pb-2 pt-1 text-xs">{t.selectRole}</p>
+                          <div className="space-y-0.5">{availableRoles.map((role) => <Button key={role} type="button" variant="ghost" className="w-full justify-start" onClick={() => addRole(role)}>{ROLE_LABELS[role]}</Button>)}</div>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                  </div>
+                )}
+              </div>
+            </aside>
+          </div>
+
+          <footer className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky bottom-0 z-20 mt-10 flex flex-col gap-3 border-t py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+              <ReadyItem done={infoComplete} label={t.infoComplete} />
+              <ReadyItem done label={t.resourcesOptional} muted />
+              <ReadyItem done={squadComplete} label={t.squadReady} />
             </div>
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>
-                {t.cancel}
-              </Button>
-              <Button type="submit" disabled={!canSubmit}>
-                {t.create}
-                <ChevronRight />
-              </Button>
-            </div>
+            <div className="flex shrink-0 justify-end gap-2"><Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>{t.cancel}</Button><Button type="submit" disabled={!canSubmit}>{t.create}<ChevronRight /></Button></div>
           </footer>
         </form>
       </main>
 
-      <FactoryManagerPanel
-        open={managerOpen}
-        onOpenChange={setManagerOpen}
-        locale={locale}
-        context={{ title, description, process, resourceCount: resources.length, squad }}
-        proposal={proposal}
-        onApplyProposal={(slots) => {
-          setSquad(slots);
-          setAiProposed(true);
-        }}
-      />
+      <FactoryManagerPanel open={managerOpen} onOpenChange={setManagerOpen} locale={locale} context={{ title, description, process, resourceCount: resources.length, squad }} proposal={proposal} onApplyProposal={(slots) => { setSquad(slots); setAiProposed(true); }} />
     </>
   );
 }
 
-function SectionHeader({
-  eyebrow,
-  title,
-  help,
-  trailing,
-}: {
-  eyebrow: string;
-  title: string;
-  help: string;
-  trailing?: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6">
-      <div>
-        <p className="eyebrow text-primary">{eyebrow}</p>
-        <h2 className="mt-1 text-base font-semibold">{title}</h2>
-        <p className="text-muted-foreground mt-1 text-xs">{help}</p>
-      </div>
-      {trailing}
-    </div>
-  );
+function SectionHeading({ number, eyebrow, title, help, trailing }: { number: string; eyebrow: string; title: string; help: string; trailing?: React.ReactNode }) {
+  return <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3"><span className="text-primary mt-0.5 text-xs font-semibold">{number}</span><div className="min-w-0"><p className="eyebrow">{eyebrow}</p><h2 className="mt-1 text-base font-semibold">{title}</h2><p className="text-muted-foreground mt-1 text-xs">{help}</p></div>{trailing}</div>;
 }
 
-function RequiredLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
-  return (
-    <Label htmlFor={htmlFor}>
-      {children} <span className="text-primary">*</span>
-    </Label>
-  );
+function RequiredLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) { return <Label htmlFor={htmlFor}>{children} <span className="text-primary">*</span></Label>; }
+
+function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[] }) {
+  return <div className="space-y-2"><Label>{label} <span className="text-primary">*</span></Label><Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label}><SelectValue /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select></div>;
 }
 
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: string[];
-}) {
+function SquadRow({ slot, agents, people, copy, expandedByDefault, onChange, onRemove }: { slot: SquadSlot; agents: ReturnType<typeof useFactory>["agents"]; people: ReturnType<typeof useFactory>["people"]; copy: typeof UI.fr | typeof UI.en; expandedByDefault: boolean; onChange: (patch: Partial<SquadSlot>) => void; onRemove: () => void }) {
+  const [expanded, setExpanded] = useState(expandedByDefault);
+  const agent = agents.find((item) => item.id === slot.agentId);
+  const person = people.find((item) => item.id === slot.personId);
   return (
-    <div className="space-y-2">
-      <Label>
-        {label} <span className="text-primary">*</span>
-      </Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger aria-label={label}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {option}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
-
-function SquadCard({
-  slot,
-  agents,
-  people,
-  copy,
-  onChange,
-  onRemove,
-}: {
-  slot: SquadSlot;
-  agents: ReturnType<typeof useFactory>["agents"];
-  people: ReturnType<typeof useFactory>["people"];
-  copy: typeof UI.fr | typeof UI.en;
-  onChange: (patch: Partial<SquadSlot>) => void;
-  onRemove: () => void;
-}) {
-  return (
-    <article className="relative rounded-xl border p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <p className="eyebrow">{ROLE_LABELS[slot.role]}</p>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-                <X />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{copy.removeRole}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <article className="py-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <div className="min-w-0"><p className="eyebrow truncate">{ROLE_LABELS[slot.role]}</p><div className="mt-1 flex min-w-0 items-center gap-3 text-xs"><span className="flex min-w-0 items-center gap-1.5"><Bot className="text-primary size-3.5 shrink-0" /><span className="truncate">{agent?.name ?? copy.unassigned}</span></span><span className="text-border">/</span><span className="flex min-w-0 items-center gap-1.5"><UserRound className="text-info size-3.5 shrink-0" /><span className="truncate">{person?.name ?? copy.unassigned}</span></span></div></div>
+        <IconTooltip label={copy.editRole}><Button type="button" variant="ghost" size="icon-sm" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? <ChevronDown /> : <Pencil />}</Button></IconTooltip>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label className="text-xs">
-            <Bot className="text-primary mr-1 inline size-3.5" />
-            {copy.agent}
-          </Label>
-          <Select
-            value={slot.agentId ?? "none"}
-            onValueChange={(value) => onChange({ agentId: value === "none" ? undefined : value })}
-          >
-            <SelectTrigger aria-label={`${copy.agent} — ${ROLE_LABELS[slot.role]}`}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">{copy.unassigned}</SelectItem>
-              {agents.map((agent) => (
-                <SelectItem key={agent.id} value={agent.id}>
-                  {agent.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">
-            <UserRound className="text-info mr-1 inline size-3.5" />
-            {copy.person}
-          </Label>
-          <Select
-            value={slot.personId ?? "none"}
-            onValueChange={(value) => onChange({ personId: value === "none" ? undefined : value })}
-          >
-            <SelectTrigger aria-label={`${copy.person} — ${ROLE_LABELS[slot.role]}`}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">{copy.unassigned}</SelectItem>
-              {people.map((person) => (
-                <SelectItem key={person.id} value={person.id}>
-                  {person.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      {expanded && <div className="bg-muted/40 mt-3 rounded-lg p-3"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"><AssignmentSelect label={copy.agent} icon={<Bot className="text-primary size-3.5" />} value={slot.agentId} options={agents.map((item) => ({ id: item.id, name: item.name }))} unassigned={copy.unassigned} onChange={(value) => onChange({ agentId: value })} /><AssignmentSelect label={copy.person} icon={<UserRound className="text-info size-3.5" />} value={slot.personId} options={people.map((item) => ({ id: item.id, name: item.name }))} unassigned={copy.unassigned} onChange={(value) => onChange({ personId: value })} /></div><Button type="button" variant="ghost" size="sm" className="text-destructive mt-2" onClick={onRemove}><X />{copy.removeRole}</Button></div>}
     </article>
   );
 }
 
-function ReadinessDot({ done, label }: { done: boolean; label: string }) {
-  return (
-    <span
-      className={cn(
-        "flex items-center gap-1.5",
-        done ? "text-foreground" : "text-muted-foreground",
-      )}
-    >
-      <span
-        className={cn("size-1.5 rounded-full", done ? "bg-success" : "bg-muted-foreground/40")}
-      />
-      {label}
-    </span>
-  );
+function AssignmentSelect({ label, icon, value, options, unassigned, onChange }: { label: string; icon: React.ReactNode; value?: string; options: { id: string; name: string }[]; unassigned: string; onChange: (value: string | undefined) => void }) {
+  return <div className="space-y-1.5"><Label className="flex items-center gap-1.5 text-xs">{icon}{label}</Label><Select value={value ?? "none"} onValueChange={(next) => onChange(next === "none" ? undefined : next)}><SelectTrigger aria-label={label}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="none">{unassigned}</SelectItem>{options.map((option) => <SelectItem key={option.id} value={option.id}>{option.name}</SelectItem>)}</SelectContent></Select></div>;
 }
 
-function ResourceIcon({ type }: { type: string }) {
-  if (["XLS", "XLSX"].includes(type)) return <FileSpreadsheet className="size-4" />;
-  if (["PDF", "DOC", "DOCX"].includes(type)) return <FileText className="size-4" />;
-  return <File className="size-4" />;
-}
-
-function formatSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} Ko`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
-}
+function ContextState({ label, value, done, neutral }: { label: string; value: string; done: boolean; neutral?: boolean }) { return <div className="min-w-0"><p className="text-muted-foreground truncate">{label}</p><p className={cn("mt-0.5 truncate font-medium", done ? "text-foreground" : neutral ? "text-muted-foreground" : "text-primary")}>{done && !neutral && <Check className="mr-1 inline size-3" />}{value}</p></div>; }
+function ReadyItem({ done, label, muted }: { done: boolean; label: string; muted?: boolean }) { return <span className={cn("flex items-center gap-1.5", done && !muted ? "text-foreground" : "text-muted-foreground")}><span className={cn("grid size-4 place-items-center rounded-full", done && !muted ? "bg-success/12 text-success" : "bg-muted")} >{done ? <Check className="size-2.5" /> : <span className="size-1 rounded-full bg-current" />}</span>{label}</span>; }
+function IconTooltip({ label, children }: { label: string; children: React.ReactNode }) { return <TooltipProvider><Tooltip><TooltipTrigger asChild>{children}</TooltipTrigger><TooltipContent>{label}</TooltipContent></Tooltip></TooltipProvider>; }
+function ResourceIcon({ type }: { type: string }) { if (["XLS", "XLSX"].includes(type)) return <FileSpreadsheet className="size-4" />; if (["PDF", "DOC", "DOCX"].includes(type)) return <FileText className="size-4" />; return <File className="size-4" />; }
+function formatSize(bytes: number) { if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} Ko`; return `${(bytes / 1024 / 1024).toFixed(1)} Mo`; }
