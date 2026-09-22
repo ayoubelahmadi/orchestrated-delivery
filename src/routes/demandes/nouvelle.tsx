@@ -349,7 +349,7 @@ function NouvelleDemande() {
                   title={t.needTitle}
                   help={t.needHelp}
                 />
-                <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="title">{t.titleLabel}</RequiredLabel>
                     <Input
@@ -409,11 +409,11 @@ function NouvelleDemande() {
                         <SelectItem value="Court">{t.short}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <div className="bg-muted/45 rounded-lg px-3.5 py-3">
+                    <div className="bg-muted/45 rounded-lg px-3.5 py-2.5">
                       <p className="text-xs leading-relaxed">
                         {process === "Standard" ? t.standardDescription : t.shortDescription}
                       </p>
-                      <p className="text-muted-foreground mt-1.5 text-[11px]">{processStages}</p>
+                      <p className="text-muted-foreground mt-1 text-[11px]">{processStages}</p>
                     </div>
                   </div>
                 </div>
