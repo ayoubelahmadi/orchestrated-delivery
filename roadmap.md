@@ -14,4 +14,4 @@
 - [x] Harmoniser les modes IA/manuel et leurs libellés
 - [x] Synchroniser les indicateurs de préparation supérieur et inférieur
 - [x] Polir l’ajout de rôle et l’en-tête Factory Manager
-- [ ] Vérifier les parcours desktop/mobile et clair/sombre
+- [x] Vérifier les parcours desktop/mobile et clair/sombre

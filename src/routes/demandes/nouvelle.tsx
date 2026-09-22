@@ -153,6 +153,7 @@ const UI = {
     searchRole: "Rechercher un rôle",
     noMatchingRole: "Aucun rôle disponible",
     proposalApplied: "La proposition a été appliquée. Vous gardez la main sur chaque rôle.",
+    aiBadge: "IA",
   },
   en: {
     title: "New request",
@@ -224,6 +225,7 @@ const UI = {
     searchRole: "Search roles",
     noMatchingRole: "No role available",
     proposalApplied: "The proposal has been applied. You remain in control of every role.",
+    aiBadge: "AI",
   },
 } as const;
 
@@ -554,7 +556,7 @@ function NouvelleDemande() {
                   {mode === "ai" && aiProposed && (
                     <Pill tone="success">
                       <Check className="size-3" />
-                      IA
+                      {t.aiBadge}
                     </Pill>
                   )}
                 </div>

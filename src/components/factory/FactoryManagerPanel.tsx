@@ -33,7 +33,7 @@ export interface FactoryManagerContext {
 const COPY = {
   fr: {
     subtitle: "Agent IA · Composition de squad",
-    context: "Contexte analysé",
+    context: "Contexte de la demande",
     request: "Informations de la demande",
     incomplete: "À compléter",
     process: "Process",
@@ -61,7 +61,7 @@ const COPY = {
   },
   en: {
     subtitle: "AI agent · Squad composition",
-    context: "Context analysed",
+    context: "Request context",
     request: "Request information",
     incomplete: "Incomplete",
     process: "Process",
