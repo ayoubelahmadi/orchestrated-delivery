@@ -51,10 +51,14 @@ export const Route = createFileRoute("/demandes/nouvelle")({
       { title: "Nouvelle demande — Factory" },
       {
         name: "description",
-        content: "Créez une demande, ajoutez son contexte et composez sa squad avec Factory Manager.",
+        content:
+          "Créez une demande, ajoutez son contexte et composez sa squad avec Factory Manager.",
       },
       { property: "og:title", content: "Nouvelle demande — Factory" },
-      { property: "og:description", content: "Espace de création de demande et de composition de squad." },
+      {
+        property: "og:description",
+        content: "Espace de création de demande et de composition de squad.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -62,7 +66,16 @@ export const Route = createFileRoute("/demandes/nouvelle")({
   component: NouvelleDemande,
 });
 
-const ALL_ROLES: RoleKey[] = ["PO", "PM", "ANALYST", "ARCHITECT", "DESIGNER", "DEV", "QA", "BRAINSTORMING"];
+const ALL_ROLES: RoleKey[] = [
+  "PO",
+  "PM",
+  "ANALYST",
+  "ARCHITECT",
+  "DESIGNER",
+  "DEV",
+  "QA",
+  "BRAINSTORMING",
+];
 const ROLES_STANDARD: RoleKey[] = ["PO", "PM", "ANALYST", "ARCHITECT", "DESIGNER", "DEV", "QA"];
 const ROLES_COURT: RoleKey[] = ["PO", "DESIGNER", "DEV", "QA"];
 type Resource = { id: string; name: string; size: number; type: string };
@@ -86,7 +99,8 @@ const UI = {
     process: "Process",
     standard: "Standard — 5 étapes",
     short: "Court — 4 étapes",
-    standardDescription: "Parcours complet pour les demandes nécessitant cadrage, analyse et conception.",
+    standardDescription:
+      "Parcours complet pour les demandes nécessitant cadrage, analyse et conception.",
     shortDescription: "Parcours resserré pour les demandes déjà cadrées ou à délai court.",
     resources: "Contexte",
     resourcesTitle: "Ressources de la demande",
@@ -105,7 +119,8 @@ const UI = {
     aiAction: "Construire ma squad avec l’IA",
     aiContinue: "Continuer avec Factory Manager",
     aiReview: "Faire optimiser cette squad",
-    aiCopy: "Analyse votre demande, son process et ses ressources pour proposer la meilleure combinaison de personnes et d’agents.",
+    aiCopy:
+      "Analyse votre demande, son process et ses ressources pour proposer la meilleure combinaison de personnes et d’agents.",
     manualCopy: "Composez directement votre squad, rôle par rôle.",
     waiting: "Aucune squad générée",
     waitingHelp: "Lancez Factory Manager lorsque votre besoin est suffisamment renseigné.",
@@ -170,7 +185,8 @@ const UI = {
     aiAction: "Build my squad with AI",
     aiContinue: "Continue with Factory Manager",
     aiReview: "Optimise this squad",
-    aiCopy: "Analyses your request, process and resources to suggest the best combination of people and agents.",
+    aiCopy:
+      "Analyses your request, process and resources to suggest the best combination of people and agents.",
     manualCopy: "Compose your squad directly, role by role.",
     waiting: "No squad generated",
     waitingHelp: "Launch Factory Manager when your request has enough detail.",
@@ -238,12 +254,16 @@ function NouvelleDemande() {
     }));
   }, [process, factory.agents, factory.people]);
 
-  const infoComplete = title.trim().length > 2 && description.trim().length > 10 && demandeur.trim().length > 1;
+  const infoComplete =
+    title.trim().length > 2 && description.trim().length > 10 && demandeur.trim().length > 1;
   const squadComplete = squad.length > 0;
   const canSubmit = infoComplete && squadComplete;
   const missingCount = Number(!infoComplete) + Number(!squadComplete);
   const availableRoles = ALL_ROLES.filter((role) => !squad.some((slot) => slot.role === role));
-  const processStages = process === "Standard" ? "Intake → Analysis → Design → Dev → Run" : "Intake → Design → Dev → Run";
+  const processStages =
+    process === "Standard"
+      ? "Intake → Analysis → Design → Dev → Run"
+      : "Intake → Design → Dev → Run";
 
   const addFiles = (files: FileList | File[]) => {
     const accepted = Array.from(files).filter((file) => {
@@ -285,9 +305,21 @@ function NouvelleDemande() {
               <h1 className="truncate text-2xl font-semibold sm:text-3xl">{t.title}</h1>
               <p className="text-muted-foreground mt-1.5 text-sm">{t.intro}</p>
             </div>
-            <span className={cn("hidden items-center gap-2 text-xs sm:flex", canSubmit ? "text-success" : "text-muted-foreground")}>
-              <span className={cn("size-2 rounded-full", canSubmit ? "bg-success" : "bg-muted-foreground/40")} />
-              {canSubmit ? t.ready : `${missingCount} ${missingCount === 1 ? t.missingOne.replace("1 ", "") : t.missingMany}`}
+            <span
+              className={cn(
+                "hidden items-center gap-2 text-xs sm:flex",
+                canSubmit ? "text-success" : "text-muted-foreground",
+              )}
+            >
+              <span
+                className={cn(
+                  "size-2 rounded-full",
+                  canSubmit ? "bg-success" : "bg-muted-foreground/40",
+                )}
+              />
+              {canSubmit
+                ? t.ready
+                : `${missingCount} ${missingCount === 1 ? t.missingOne.replace("1 ", "") : t.missingMany}`}
             </span>
           </div>
         </header>
@@ -296,41 +328,91 @@ function NouvelleDemande() {
           onSubmit={(event) => {
             event.preventDefault();
             if (!canSubmit) return;
-            const id = factory.createDemande({ title: title.trim(), description: description.trim(), type, process, demandeur, priority, squad });
+            const id = factory.createDemande({
+              title: title.trim(),
+              description: description.trim(),
+              type,
+              process,
+              demandeur,
+              priority,
+              squad,
+            });
             navigate({ to: "/demandes/$id", params: { id } });
           }}
         >
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(390px,0.88fr)] xl:gap-12">
             <div className="min-w-0 space-y-10">
               <section>
-                <SectionHeading number="01" eyebrow={t.need} title={t.needTitle} help={t.needHelp} />
+                <SectionHeading
+                  number="01"
+                  eyebrow={t.need}
+                  title={t.needTitle}
+                  help={t.needHelp}
+                />
                 <div className="mt-5 grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="title">{t.titleLabel}</RequiredLabel>
-                    <Input id="title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t.titlePlaceholder} required />
+                    <Input
+                      id="title"
+                      value={title}
+                      onChange={(event) => setTitle(event.target.value)}
+                      placeholder={t.titlePlaceholder}
+                      required
+                    />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="description">{t.description}</RequiredLabel>
-                    <Textarea id="description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder={t.descriptionPlaceholder} className="min-h-28 resize-y" required />
+                    <Textarea
+                      id="description"
+                      value={description}
+                      onChange={(event) => setDescription(event.target.value)}
+                      placeholder={t.descriptionPlaceholder}
+                      className="min-h-28 resize-y"
+                      required
+                    />
                     <p className="text-muted-foreground text-xs">{t.descriptionHelp}</p>
                   </div>
-                  <SelectField label={t.projectType} value={type} onChange={(value) => setType(value as ProjectType)} options={["Power Platform", "RPA", "Fullstack"]} />
-                  <SelectField label={t.priority} value={priority} onChange={(value) => setPriority(value as Priority)} options={["Basse", "Normale", "Haute", "Critique"]} />
+                  <SelectField
+                    label={t.projectType}
+                    value={type}
+                    onChange={(value) => setType(value as ProjectType)}
+                    options={["Power Platform", "RPA", "Fullstack"]}
+                  />
+                  <SelectField
+                    label={t.priority}
+                    value={priority}
+                    onChange={(value) => setPriority(value as Priority)}
+                    options={["Basse", "Normale", "Haute", "Critique"]}
+                  />
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="demandeur">{t.requester}</RequiredLabel>
-                    <Input id="demandeur" value={demandeur} onChange={(event) => setDemandeur(event.target.value)} required />
+                    <Input
+                      id="demandeur"
+                      value={demandeur}
+                      onChange={(event) => setDemandeur(event.target.value)}
+                      required
+                    />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label>{t.process} <span className="text-primary">*</span></Label>
-                    <Select value={process} onValueChange={(value) => setProcess(value as ProcessKind)}>
-                      <SelectTrigger aria-label={t.process}><SelectValue /></SelectTrigger>
+                    <Label>
+                      {t.process} <span className="text-primary">*</span>
+                    </Label>
+                    <Select
+                      value={process}
+                      onValueChange={(value) => setProcess(value as ProcessKind)}
+                    >
+                      <SelectTrigger aria-label={t.process}>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Standard">{t.standard}</SelectItem>
                         <SelectItem value="Court">{t.short}</SelectItem>
                       </SelectContent>
                     </Select>
                     <div className="bg-muted/45 rounded-lg px-3.5 py-3">
-                      <p className="text-xs leading-relaxed">{process === "Standard" ? t.standardDescription : t.shortDescription}</p>
+                      <p className="text-xs leading-relaxed">
+                        {process === "Standard" ? t.standardDescription : t.shortDescription}
+                      </p>
                       <p className="text-muted-foreground mt-1.5 text-[11px]">{processStages}</p>
                     </div>
                   </div>
@@ -338,30 +420,94 @@ function NouvelleDemande() {
               </section>
 
               <section className="border-t pt-8">
-                <SectionHeading number="02" eyebrow={t.resources} title={t.resourcesTitle} help={t.resourcesHelp} trailing={<Pill tone="neutral">{t.optional}</Pill>} />
-                <input ref={fileInput} type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" className="sr-only" onChange={(event) => { if (event.target.files) addFiles(event.target.files); event.target.value = ""; }} />
+                <SectionHeading
+                  number="02"
+                  eyebrow={t.resources}
+                  title={t.resourcesTitle}
+                  help={t.resourcesHelp}
+                  trailing={<Pill tone="neutral">{t.optional}</Pill>}
+                />
+                <input
+                  ref={fileInput}
+                  type="file"
+                  multiple
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+                  className="sr-only"
+                  onChange={(event) => {
+                    if (event.target.files) addFiles(event.target.files);
+                    event.target.value = "";
+                  }}
+                />
                 {resources.length === 0 ? (
                   <div
                     onDragOver={(event) => event.preventDefault()}
-                    onDrop={(event: DragEvent<HTMLDivElement>) => { event.preventDefault(); addFiles(event.dataTransfer.files); }}
+                    onDrop={(event: DragEvent<HTMLDivElement>) => {
+                      event.preventDefault();
+                      addFiles(event.dataTransfer.files);
+                    }}
                     className="border-input hover:border-primary/50 mt-5 flex min-h-20 items-center gap-4 rounded-lg border border-dashed px-4 py-3.5 transition-colors"
                   >
-                    <span className="bg-muted text-primary grid size-9 shrink-0 place-items-center rounded-lg"><UploadCloud className="size-4" /></span>
+                    <span className="bg-muted text-primary grid size-9 shrink-0 place-items-center rounded-lg">
+                      <UploadCloud className="size-4" />
+                    </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{t.drop} <button type="button" className="text-primary underline-offset-4 hover:underline" onClick={() => fileInput.current?.click()}>{t.browse}</button></p>
+                      <p className="text-sm font-medium">
+                        {t.drop}{" "}
+                        <button
+                          type="button"
+                          className="text-primary underline-offset-4 hover:underline"
+                          onClick={() => fileInput.current?.click()}
+                        >
+                          {t.browse}
+                        </button>
+                      </p>
                       <p className="text-muted-foreground mt-0.5 text-xs">{t.formats}</p>
                     </div>
                   </div>
                 ) : (
                   <div className="mt-5 space-y-2">
                     {resources.map((resource) => (
-                      <div key={resource.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b py-2.5">
-                        <span className="bg-muted text-muted-foreground grid size-8 shrink-0 place-items-center rounded-md"><ResourceIcon type={resource.type} /></span>
-                        <span className="min-w-0"><span className="block truncate text-sm font-medium">{resource.name}</span><span className="text-muted-foreground text-xs">{resource.type} · {formatSize(resource.size)}</span></span>
-                        <IconTooltip label={t.remove}><Button type="button" variant="ghost" size="icon-sm" onClick={() => setResources((items) => items.filter((item) => item.id !== resource.id))}><Trash2 /></Button></IconTooltip>
+                      <div
+                        key={resource.id}
+                        className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b py-2.5"
+                      >
+                        <span className="bg-muted text-muted-foreground grid size-8 shrink-0 place-items-center rounded-md">
+                          <ResourceIcon type={resource.type} />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium">
+                            {resource.name}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            {resource.type} · {formatSize(resource.size)}
+                          </span>
+                        </span>
+                        <IconTooltip label={t.remove}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() =>
+                              setResources((items) =>
+                                items.filter((item) => item.id !== resource.id),
+                              )
+                            }
+                          >
+                            <Trash2 />
+                          </Button>
+                        </IconTooltip>
                       </div>
                     ))}
-                    <Button type="button" variant="ghost" size="sm" className="mt-1" onClick={() => fileInput.current?.click()}><Plus />{t.addFiles}</Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-1"
+                      onClick={() => fileInput.current?.click()}
+                    >
+                      <Plus />
+                      {t.addFiles}
+                    </Button>
                   </div>
                 )}
               </section>
@@ -371,30 +517,83 @@ function NouvelleDemande() {
               <div className="border-b px-5 py-4">
                 <p className="eyebrow text-primary">03 · {t.squad}</p>
                 <div className="mt-1 flex items-start justify-between gap-3">
-                  <div><h2 className="text-base font-semibold">{t.squadTitle}</h2><p className="text-muted-foreground mt-0.5 text-xs">{t.squadHelp}</p></div>
-                  {aiProposed && <Pill tone="success"><Check className="size-3" />IA</Pill>}
+                  <div>
+                    <h2 className="text-base font-semibold">{t.squadTitle}</h2>
+                    <p className="text-muted-foreground mt-0.5 text-xs">{t.squadHelp}</p>
+                  </div>
+                  {aiProposed && (
+                    <Pill tone="success">
+                      <Check className="size-3" />
+                      IA
+                    </Pill>
+                  )}
                 </div>
                 <div className="bg-muted mt-4 grid grid-cols-2 rounded-lg p-1">
-                  <Button type="button" size="sm" variant={mode === "ai" ? "secondary" : "ghost"} className={cn("w-full", mode === "ai" && "bg-background shadow-sm")} onClick={() => setMode("ai")}><Workflow />{t.aiMode}</Button>
-                  <Button type="button" size="sm" variant={mode === "manual" ? "secondary" : "ghost"} className={cn("w-full", mode === "manual" && "bg-background shadow-sm")} onClick={() => setMode("manual")}><UserRound />{t.manualMode}</Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={mode === "ai" ? "secondary" : "ghost"}
+                    className={cn("w-full", mode === "ai" && "bg-background shadow-sm")}
+                    onClick={() => setMode("ai")}
+                  >
+                    <Workflow />
+                    {t.aiMode}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={mode === "manual" ? "secondary" : "ghost"}
+                    className={cn("w-full", mode === "manual" && "bg-background shadow-sm")}
+                    onClick={() => setMode("manual")}
+                  >
+                    <UserRound />
+                    {t.manualMode}
+                  </Button>
                 </div>
               </div>
 
               <div className="px-5 py-4">
                 <div className="bg-muted/40 rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <span className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-lg"><Workflow className="size-4" /></span>
-                    <div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><p className="text-sm font-semibold">Factory Manager</p>{aiProposed && <span className="text-success text-[11px] font-medium">{t.proposed}</span>}</div><p className="text-muted-foreground mt-1 text-xs leading-relaxed">{mode === "ai" ? t.aiCopy : t.manualCopy}</p></div>
+                    <span className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-lg">
+                      <Workflow className="size-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold">Factory Manager</p>
+                        {aiProposed && (
+                          <span className="text-success text-[11px] font-medium">{t.proposed}</span>
+                        )}
+                      </div>
+                      <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                        {mode === "ai" ? t.aiCopy : t.manualCopy}
+                      </p>
+                    </div>
                   </div>
                   {mode === "ai" && !aiProposed && (
                     <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-[11px]">
-                      <ContextState label={t.requestContext} value={infoComplete ? t.complete : t.incomplete} done={infoComplete} />
+                      <ContextState
+                        label={t.requestContext}
+                        value={infoComplete ? t.complete : t.incomplete}
+                        done={infoComplete}
+                      />
                       <ContextState label={t.process} value={process} done />
-                      <ContextState label={t.resourceContext} value={String(resources.length)} done={resources.length > 0} neutral />
+                      <ContextState
+                        label={t.resourceContext}
+                        value={String(resources.length)}
+                        done={resources.length > 0}
+                        neutral
+                      />
                     </div>
                   )}
-                  <Button type="button" variant={mode === "ai" && !aiProposed ? "default" : "outline"} className="mt-4 w-full" onClick={() => setManagerOpen(true)}>
-                    <Workflow />{mode === "manual" ? t.aiReview : aiProposed ? t.aiContinue : t.aiAction}
+                  <Button
+                    type="button"
+                    variant={mode === "ai" && !aiProposed ? "default" : "outline"}
+                    className="mt-4 w-full"
+                    onClick={() => setManagerOpen(true)}
+                  >
+                    <Workflow />
+                    {mode === "manual" ? t.aiReview : aiProposed ? t.aiContinue : t.aiAction}
                   </Button>
                 </div>
               </div>
@@ -402,26 +601,77 @@ function NouvelleDemande() {
               <div className="border-t">
                 {mode === "ai" && !aiProposed && squad.length === 0 ? (
                   <div className="px-6 py-10 text-center">
-                    <span className="bg-muted text-muted-foreground mx-auto grid size-10 place-items-center rounded-full"><Users className="size-4" /></span>
+                    <span className="bg-muted text-muted-foreground mx-auto grid size-10 place-items-center rounded-full">
+                      <Users className="size-4" />
+                    </span>
                     <p className="mt-3 text-sm font-medium">{t.waiting}</p>
-                    <p className="text-muted-foreground mx-auto mt-1 max-w-xs text-xs leading-relaxed">{t.waitingHelp}</p>
+                    <p className="text-muted-foreground mx-auto mt-1 max-w-xs text-xs leading-relaxed">
+                      {t.waitingHelp}
+                    </p>
                   </div>
                 ) : (
                   <div className="px-5 py-4">
-                    <div className="mb-2 flex items-center justify-between"><p className="text-sm font-semibold">{aiProposed ? t.proposed : t.configured}</p><span className="text-muted-foreground text-xs">{squad.length} {t.roles}</span></div>
-                    {squad.length === 0 ? <p className="text-muted-foreground py-6 text-center text-xs">{t.noRole}</p> : (
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-sm font-semibold">
+                        {aiProposed ? t.proposed : t.configured}
+                      </p>
+                      <span className="text-muted-foreground text-xs">
+                        {squad.length} {t.roles}
+                      </span>
+                    </div>
+                    {squad.length === 0 ? (
+                      <p className="text-muted-foreground py-6 text-center text-xs">{t.noRole}</p>
+                    ) : (
                       <div className="divide-y">
                         {squad.map((slot) => (
-                          <SquadRow key={slot.role} slot={slot} agents={factory.agents} people={factory.people} copy={t} expandedByDefault={mode === "manual" && squad.length <= 2} onChange={(patch) => { setSquad((items) => items.map((item) => item.role === slot.role ? { ...item, ...patch } : item)); setAiProposed(false); }} onRemove={() => { setSquad((items) => items.filter((item) => item.role !== slot.role)); setAiProposed(false); }} />
+                          <SquadRow
+                            key={slot.role}
+                            slot={slot}
+                            agents={factory.agents}
+                            people={factory.people}
+                            copy={t}
+                            expandedByDefault={mode === "manual" && squad.length <= 2}
+                            onChange={(patch) => {
+                              setSquad((items) =>
+                                items.map((item) =>
+                                  item.role === slot.role ? { ...item, ...patch } : item,
+                                ),
+                              );
+                              setAiProposed(false);
+                            }}
+                            onRemove={() => {
+                              setSquad((items) => items.filter((item) => item.role !== slot.role));
+                              setAiProposed(false);
+                            }}
+                          />
                         ))}
                       </div>
                     )}
                     {availableRoles.length > 0 && (
                       <Popover open={addRoleOpen} onOpenChange={setAddRoleOpen}>
-                        <PopoverTrigger asChild><Button type="button" variant="ghost" size="sm" className="mt-3"><Plus />{t.addRole}</Button></PopoverTrigger>
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant="ghost" size="sm" className="mt-3">
+                            <Plus />
+                            {t.addRole}
+                          </Button>
+                        </PopoverTrigger>
                         <PopoverContent align="start" className="w-64 p-2">
-                          <p className="text-muted-foreground px-2 pb-2 pt-1 text-xs">{t.selectRole}</p>
-                          <div className="space-y-0.5">{availableRoles.map((role) => <Button key={role} type="button" variant="ghost" className="w-full justify-start" onClick={() => addRole(role)}>{ROLE_LABELS[role]}</Button>)}</div>
+                          <p className="text-muted-foreground px-2 pb-2 pt-1 text-xs">
+                            {t.selectRole}
+                          </p>
+                          <div className="space-y-0.5">
+                            {availableRoles.map((role) => (
+                              <Button
+                                key={role}
+                                type="button"
+                                variant="ghost"
+                                className="w-full justify-start"
+                                onClick={() => addRole(role)}
+                              >
+                                {ROLE_LABELS[role]}
+                              </Button>
+                            ))}
+                          </div>
                         </PopoverContent>
                       </Popover>
                     )}
@@ -437,47 +687,292 @@ function NouvelleDemande() {
               <ReadyItem done label={t.resourcesOptional} muted />
               <ReadyItem done={squadComplete} label={t.squadReady} />
             </div>
-            <div className="flex shrink-0 justify-end gap-2"><Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>{t.cancel}</Button><Button type="submit" disabled={!canSubmit}>{t.create}<ChevronRight /></Button></div>
+            <div className="flex shrink-0 justify-end gap-2">
+              <Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>
+                {t.cancel}
+              </Button>
+              <Button type="submit" disabled={!canSubmit}>
+                {t.create}
+                <ChevronRight />
+              </Button>
+            </div>
           </footer>
         </form>
       </main>
 
-      <FactoryManagerPanel open={managerOpen} onOpenChange={setManagerOpen} locale={locale} context={{ title, description, process, resourceCount: resources.length, squad }} proposal={proposal} onApplyProposal={(slots) => { setSquad(slots); setAiProposed(true); }} />
+      <FactoryManagerPanel
+        open={managerOpen}
+        onOpenChange={setManagerOpen}
+        locale={locale}
+        context={{ title, description, process, resourceCount: resources.length, squad }}
+        proposal={proposal}
+        onApplyProposal={(slots) => {
+          setSquad(slots);
+          setAiProposed(true);
+        }}
+      />
     </>
   );
 }
 
-function SectionHeading({ number, eyebrow, title, help, trailing }: { number: string; eyebrow: string; title: string; help: string; trailing?: React.ReactNode }) {
-  return <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3"><span className="text-primary mt-0.5 text-xs font-semibold">{number}</span><div className="min-w-0"><p className="eyebrow">{eyebrow}</p><h2 className="mt-1 text-base font-semibold">{title}</h2><p className="text-muted-foreground mt-1 text-xs">{help}</p></div>{trailing}</div>;
+function SectionHeading({
+  number,
+  eyebrow,
+  title,
+  help,
+  trailing,
+}: {
+  number: string;
+  eyebrow: string;
+  title: string;
+  help: string;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3">
+      <span className="text-primary mt-0.5 text-xs font-semibold">{number}</span>
+      <div className="min-w-0">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="mt-1 text-base font-semibold">{title}</h2>
+        <p className="text-muted-foreground mt-1 text-xs">{help}</p>
+      </div>
+      {trailing}
+    </div>
+  );
 }
 
-function RequiredLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) { return <Label htmlFor={htmlFor}>{children} <span className="text-primary">*</span></Label>; }
-
-function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[] }) {
-  return <div className="space-y-2"><Label>{label} <span className="text-primary">*</span></Label><Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label}><SelectValue /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select></div>;
+function RequiredLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
+  return (
+    <Label htmlFor={htmlFor}>
+      {children} <span className="text-primary">*</span>
+    </Label>
+  );
 }
 
-function SquadRow({ slot, agents, people, copy, expandedByDefault, onChange, onRemove }: { slot: SquadSlot; agents: ReturnType<typeof useFactory>["agents"]; people: ReturnType<typeof useFactory>["people"]; copy: typeof UI.fr | typeof UI.en; expandedByDefault: boolean; onChange: (patch: Partial<SquadSlot>) => void; onRemove: () => void }) {
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>
+        {label} <span className="text-primary">*</span>
+      </Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function SquadRow({
+  slot,
+  agents,
+  people,
+  copy,
+  expandedByDefault,
+  onChange,
+  onRemove,
+}: {
+  slot: SquadSlot;
+  agents: ReturnType<typeof useFactory>["agents"];
+  people: ReturnType<typeof useFactory>["people"];
+  copy: typeof UI.fr | typeof UI.en;
+  expandedByDefault: boolean;
+  onChange: (patch: Partial<SquadSlot>) => void;
+  onRemove: () => void;
+}) {
   const [expanded, setExpanded] = useState(expandedByDefault);
   const agent = agents.find((item) => item.id === slot.agentId);
   const person = people.find((item) => item.id === slot.personId);
   return (
     <article className="py-3">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="min-w-0"><p className="eyebrow truncate">{ROLE_LABELS[slot.role]}</p><div className="mt-1 flex min-w-0 items-center gap-3 text-xs"><span className="flex min-w-0 items-center gap-1.5"><Bot className="text-primary size-3.5 shrink-0" /><span className="truncate">{agent?.name ?? copy.unassigned}</span></span><span className="text-border">/</span><span className="flex min-w-0 items-center gap-1.5"><UserRound className="text-info size-3.5 shrink-0" /><span className="truncate">{person?.name ?? copy.unassigned}</span></span></div></div>
-        <IconTooltip label={copy.editRole}><Button type="button" variant="ghost" size="icon-sm" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? <ChevronDown /> : <Pencil />}</Button></IconTooltip>
+        <div className="min-w-0">
+          <p className="eyebrow truncate">{ROLE_LABELS[slot.role]}</p>
+          <div className="mt-1 flex min-w-0 items-center gap-3 text-xs">
+            <span className="flex min-w-0 items-center gap-1.5">
+              <Bot className="text-primary size-3.5 shrink-0" />
+              <span className="truncate">{agent?.name ?? copy.unassigned}</span>
+            </span>
+            <span className="text-border">/</span>
+            <span className="flex min-w-0 items-center gap-1.5">
+              <UserRound className="text-info size-3.5 shrink-0" />
+              <span className="truncate">{person?.name ?? copy.unassigned}</span>
+            </span>
+          </div>
+        </div>
+        <IconTooltip label={copy.editRole}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-expanded={expanded}
+            onClick={() => setExpanded((value) => !value)}
+          >
+            {expanded ? <ChevronDown /> : <Pencil />}
+          </Button>
+        </IconTooltip>
       </div>
-      {expanded && <div className="bg-muted/40 mt-3 rounded-lg p-3"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"><AssignmentSelect label={copy.agent} icon={<Bot className="text-primary size-3.5" />} value={slot.agentId} options={agents.map((item) => ({ id: item.id, name: item.name }))} unassigned={copy.unassigned} onChange={(value) => onChange({ agentId: value })} /><AssignmentSelect label={copy.person} icon={<UserRound className="text-info size-3.5" />} value={slot.personId} options={people.map((item) => ({ id: item.id, name: item.name }))} unassigned={copy.unassigned} onChange={(value) => onChange({ personId: value })} /></div><Button type="button" variant="ghost" size="sm" className="text-destructive mt-2" onClick={onRemove}><X />{copy.removeRole}</Button></div>}
+      {expanded && (
+        <div className="bg-muted/40 mt-3 rounded-lg p-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <AssignmentSelect
+              label={copy.agent}
+              icon={<Bot className="text-primary size-3.5" />}
+              value={slot.agentId}
+              options={agents.map((item) => ({ id: item.id, name: item.name }))}
+              unassigned={copy.unassigned}
+              onChange={(value) => onChange({ agentId: value })}
+            />
+            <AssignmentSelect
+              label={copy.person}
+              icon={<UserRound className="text-info size-3.5" />}
+              value={slot.personId}
+              options={people.map((item) => ({ id: item.id, name: item.name }))}
+              unassigned={copy.unassigned}
+              onChange={(value) => onChange({ personId: value })}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-destructive mt-2"
+            onClick={onRemove}
+          >
+            <X />
+            {copy.removeRole}
+          </Button>
+        </div>
+      )}
     </article>
   );
 }
 
-function AssignmentSelect({ label, icon, value, options, unassigned, onChange }: { label: string; icon: React.ReactNode; value: string | undefined; options: { id: string; name: string }[]; unassigned: string; onChange: (value: string | undefined) => void }) {
-  return <div className="space-y-1.5"><Label className="flex items-center gap-1.5 text-xs">{icon}{label}</Label><Select value={value ?? "none"} onValueChange={(next) => onChange(next === "none" ? undefined : next)}><SelectTrigger aria-label={label}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="none">{unassigned}</SelectItem>{options.map((option) => <SelectItem key={option.id} value={option.id}>{option.name}</SelectItem>)}</SelectContent></Select></div>;
+function AssignmentSelect({
+  label,
+  icon,
+  value,
+  options,
+  unassigned,
+  onChange,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  value: string | undefined;
+  options: { id: string; name: string }[];
+  unassigned: string;
+  onChange: (value: string | undefined) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="flex items-center gap-1.5 text-xs">
+        {icon}
+        {label}
+      </Label>
+      <Select
+        value={value ?? "none"}
+        onValueChange={(next) => onChange(next === "none" ? undefined : next)}
+      >
+        <SelectTrigger aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">{unassigned}</SelectItem>
+          {options.map((option) => (
+            <SelectItem key={option.id} value={option.id}>
+              {option.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }
 
-function ContextState({ label, value, done, neutral }: { label: string; value: string; done: boolean; neutral?: boolean }) { return <div className="min-w-0"><p className="text-muted-foreground truncate">{label}</p><p className={cn("mt-0.5 truncate font-medium", done ? "text-foreground" : neutral ? "text-muted-foreground" : "text-primary")}>{done && !neutral && <Check className="mr-1 inline size-3" />}{value}</p></div>; }
-function ReadyItem({ done, label, muted }: { done: boolean; label: string; muted?: boolean }) { return <span className={cn("flex items-center gap-1.5", done && !muted ? "text-foreground" : "text-muted-foreground")}><span className={cn("grid size-4 place-items-center rounded-full", done && !muted ? "bg-success/12 text-success" : "bg-muted")} >{done ? <Check className="size-2.5" /> : <span className="size-1 rounded-full bg-current" />}</span>{label}</span>; }
-function IconTooltip({ label, children }: { label: string; children: React.ReactNode }) { return <TooltipProvider><Tooltip><TooltipTrigger asChild>{children}</TooltipTrigger><TooltipContent>{label}</TooltipContent></Tooltip></TooltipProvider>; }
-function ResourceIcon({ type }: { type: string }) { if (["XLS", "XLSX"].includes(type)) return <FileSpreadsheet className="size-4" />; if (["PDF", "DOC", "DOCX"].includes(type)) return <FileText className="size-4" />; return <File className="size-4" />; }
-function formatSize(bytes: number) { if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} Ko`; return `${(bytes / 1024 / 1024).toFixed(1)} Mo`; }
+function ContextState({
+  label,
+  value,
+  done,
+  neutral,
+}: {
+  label: string;
+  value: string;
+  done: boolean;
+  neutral?: boolean;
+}) {
+  return (
+    <div className="min-w-0">
+      <p className="text-muted-foreground truncate">{label}</p>
+      <p
+        className={cn(
+          "mt-0.5 truncate font-medium",
+          done ? "text-foreground" : neutral ? "text-muted-foreground" : "text-primary",
+        )}
+      >
+        {done && !neutral && <Check className="mr-1 inline size-3" />}
+        {value}
+      </p>
+    </div>
+  );
+}
+function ReadyItem({ done, label, muted }: { done: boolean; label: string; muted?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "flex items-center gap-1.5",
+        done && !muted ? "text-foreground" : "text-muted-foreground",
+      )}
+    >
+      <span
+        className={cn(
+          "grid size-4 place-items-center rounded-full",
+          done && !muted ? "bg-success/12 text-success" : "bg-muted",
+        )}
+      >
+        {done ? (
+          <Check className="size-2.5" />
+        ) : (
+          <span className="size-1 rounded-full bg-current" />
+        )}
+      </span>
+      {label}
+    </span>
+  );
+}
+function IconTooltip({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent>{label}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+function ResourceIcon({ type }: { type: string }) {
+  if (["XLS", "XLSX"].includes(type)) return <FileSpreadsheet className="size-4" />;
+  if (["PDF", "DOC", "DOCX"].includes(type)) return <FileText className="size-4" />;
+  return <File className="size-4" />;
+}
+function formatSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} Ko`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
+}
