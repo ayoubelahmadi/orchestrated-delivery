@@ -9,9 +9,9 @@
 
 ## V2.1 — Raffinement UX
 
-- [ ] Rendre l’application de la proposition IA explicitement humaine
-- [ ] Prioriser les informations essentielles avant les questions contextuelles
-- [ ] Harmoniser les modes IA/manuel et leurs libellés
-- [ ] Synchroniser les indicateurs de préparation supérieur et inférieur
-- [ ] Polir l’ajout de rôle et l’en-tête Factory Manager
+- [x] Rendre l’application de la proposition IA explicitement humaine
+- [x] Prioriser les informations essentielles avant les questions contextuelles
+- [x] Harmoniser les modes IA/manuel et leurs libellés
+- [x] Synchroniser les indicateurs de préparation supérieur et inférieur
+- [x] Polir l’ajout de rôle et l’en-tête Factory Manager
 - [ ] Vérifier les parcours desktop/mobile et clair/sombre

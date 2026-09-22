@@ -309,6 +309,7 @@ function NouvelleDemande() {
     ]);
     setAiProposed(false);
     setAddRoleOpen(false);
+    setRoleSearch("");
   };
 
   return (
@@ -369,6 +370,7 @@ function NouvelleDemande() {
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="title">{t.titleLabel}</RequiredLabel>
                     <Input
+                      ref={titleInput}
                       id="title"
                       value={title}
                       onChange={(event) => setTitle(event.target.value)}
@@ -379,6 +381,7 @@ function NouvelleDemande() {
                   <div className="space-y-2 sm:col-span-2">
                     <RequiredLabel htmlFor="description">{t.description}</RequiredLabel>
                     <Textarea
+                      ref={descriptionInput}
                       id="description"
                       value={description}
                       onChange={(event) => setDescription(event.target.value)}
@@ -546,7 +549,7 @@ function NouvelleDemande() {
                     <h2 className="text-base font-semibold">{t.squadTitle}</h2>
                     <p className="text-muted-foreground mt-0.5 text-xs">{t.squadHelp}</p>
                   </div>
-                  {aiProposed && (
+                  {mode === "ai" && aiProposed && (
                     <Pill tone="success">
                       <Check className="size-3" />
                       IA
@@ -586,7 +589,7 @@ function NouvelleDemande() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-sm font-semibold">Factory Manager</p>
-                        {aiProposed && (
+                        {mode === "ai" && aiProposed && (
                           <span className="text-success text-[11px] font-medium">{t.proposed}</span>
                         )}
                       </div>
@@ -638,7 +641,7 @@ function NouvelleDemande() {
                   <div className="px-5 py-4">
                     <div className="mb-2 flex items-center justify-between">
                       <p className="text-sm font-semibold">
-                        {aiProposed ? t.proposed : t.configured}
+                        {mode === "ai" && aiProposed ? t.proposed : t.configured}
                       </p>
                       <span className="text-muted-foreground text-xs">
                         {squad.length} {t.roles}
@@ -673,29 +676,55 @@ function NouvelleDemande() {
                       </div>
                     )}
                     {availableRoles.length > 0 && (
-                      <Popover open={addRoleOpen} onOpenChange={setAddRoleOpen}>
+                      <Popover
+                        open={addRoleOpen}
+                        onOpenChange={(open) => {
+                          setAddRoleOpen(open);
+                          if (!open) setRoleSearch("");
+                        }}
+                      >
                         <PopoverTrigger asChild>
                           <Button type="button" variant="ghost" size="sm" className="mt-3">
                             <Plus />
                             {t.addRole}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent align="start" className="w-64 p-2">
+                        <PopoverContent
+                          align="start"
+                          side="top"
+                          sideOffset={8}
+                          className="w-72 p-2"
+                        >
                           <p className="text-muted-foreground px-2 pb-2 pt-1 text-xs">
                             {t.selectRole}
                           </p>
-                          <div className="space-y-0.5">
-                            {availableRoles.map((role) => (
-                              <Button
-                                key={role}
-                                type="button"
-                                variant="ghost"
-                                className="w-full justify-start"
-                                onClick={() => addRole(role)}
-                              >
-                                {ROLE_LABELS[role]}
-                              </Button>
-                            ))}
+                          {availableRoles.length > 5 && (
+                            <Input
+                              value={roleSearch}
+                              onChange={(event) => setRoleSearch(event.target.value)}
+                              placeholder={t.searchRole}
+                              aria-label={t.searchRole}
+                              className="mb-2 h-9"
+                            />
+                          )}
+                          <div className="max-h-64 space-y-0.5 overflow-y-auto">
+                            {visibleRoles.length ? (
+                              visibleRoles.map((role) => (
+                                <Button
+                                  key={role}
+                                  type="button"
+                                  variant="ghost"
+                                  className="w-full justify-start"
+                                  onClick={() => addRole(role)}
+                                >
+                                  {ROLE_LABELS[role]}
+                                </Button>
+                              ))
+                            ) : (
+                              <p className="text-muted-foreground px-2 py-3 text-xs">
+                                {t.noMatchingRole}
+                              </p>
+                            )}
                           </div>
                         </PopoverContent>
                       </Popover>
@@ -708,9 +737,9 @@ function NouvelleDemande() {
 
           <footer className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky bottom-0 z-20 mt-10 flex flex-col gap-3 border-t py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-              <ReadyItem done={infoComplete} label={t.infoComplete} />
-              <ReadyItem done label={t.resourcesOptional} muted />
-              <ReadyItem done={squadComplete} label={t.squadReady} />
+              <ReadyItem done={infoComplete} label={infoComplete ? t.infoComplete : t.infoIncomplete} />
+              <ReadyItem done={false} label={t.resourcesOptional} muted />
+              <ReadyItem done={squadComplete} label={squadComplete ? t.squadReady : t.squadIncomplete} />
             </div>
             <div className="flex shrink-0 justify-end gap-2">
               <Button type="button" variant="ghost" onClick={() => navigate({ to: "/pipeline" })}>
@@ -734,6 +763,12 @@ function NouvelleDemande() {
         onApplyProposal={(slots) => {
           setSquad(slots);
           setAiProposed(true);
+          toast.success(t.proposalApplied);
+        }}
+        onCompleteRequest={() => {
+          const target = title.trim().length <= 2 ? titleInput.current : descriptionInput.current;
+          target?.scrollIntoView({ behavior: "smooth", block: "center" });
+          window.setTimeout(() => target?.focus(), 240);
         }}
       />
     </>

@@ -165,7 +165,13 @@ export function FactoryManagerPanel({
   };
 
   useEffect(() => {
-    if (open && (phase === "idle" || (phase === "incomplete" && requestComplete))) analyse();
+    if (
+      open &&
+      (phase === "idle" ||
+        (phase === "incomplete" && requestComplete) ||
+        (!requestComplete && phase !== "incomplete"))
+    )
+      analyse();
     // The first analysis intentionally starts only once per panel session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, requestComplete]);
@@ -311,7 +317,7 @@ export function FactoryManagerPanel({
               <PromptInputFooter className="justify-end">
                 <PromptInputSubmit
                   status={phase === "analysing" ? "submitted" : "ready"}
-                  disabled={phase === "analysing" || phase === "incomplete"}
+                  disabled={phase === "analysing" || phase === "incomplete" || phase === "proposed"}
                   aria-label={locale === "fr" ? "Envoyer" : "Send"}
                 />
               </PromptInputFooter>
