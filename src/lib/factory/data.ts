@@ -24,6 +24,55 @@ export const people: Person[] = [
     role: "PM",
     initials: "ME",
   },
+  {
+    id: "da7e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Nora Benali",
+    jobTitle: "Product Owner",
+    role: "PO",
+    initials: "NB",
+  },
+  {
+    id: "d97e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Mehdi El Yasser",
+    jobTitle: "Delivery Manager",
+    role: "PM",
+    initials: "ME",
+  },
+  {
+    id: "db7e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Elias Martin",
+    jobTitle: "Senior Business Analyst",
+    role: "ANALYST",
+    initials: "EM",
+  },
+  {
+    id: "dc7e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Sofia Laurent",
+    jobTitle: "Lead Solution Architect",
+    role: "ARCHITECT",
+    initials: "SL",
+  },
+  {
+    id: "dd7e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Lina Caron",
+    jobTitle: "Lead UX Designer",
+    role: "DESIGNER",
+    initials: "LC",
+  },
+  {
+    id: "de7e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Hugo Bernard",
+    jobTitle: "Lead Developer & DevOps",
+    role: "DEV",
+    initials: "HB",
+  },
+  {
+    id: "df7e50c8-66b3-f111-aaac-7ced8d8527dd",
+    name: "Maya Robert",
+    jobTitle: "QA Lead",
+    role: "QA",
+    initials: "MR",
+  },
 ];
 
 export const agents: Agent[] = [

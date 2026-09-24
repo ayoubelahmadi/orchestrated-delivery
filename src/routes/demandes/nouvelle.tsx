@@ -1,7 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { Bot, RefreshCw, Sparkles } from "lucide-react";
+import { Bot, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import {
+  composeSquadWithCopilot,
+  AGENT_GUID_MAP,
+} from "@/lib/factory/copilotComposer";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,22 +63,99 @@ function NouvelleDemande() {
   const [demandeur, setDemandeur] = useState("Direction des opérations");
   const [priority, setPriority] = useState<Priority>("Normale");
   const [overrides, setOverrides] = useState<Record<string, Partial<SquadSlot>>>({});
+  const [isComposing, setIsComposing] = useState(false);
+  const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
+  const [aiReasons, setAiReasons] = useState<Record<string, string>>({});
 
   const roles = process === "Standard" ? ROLES_STANDARD : ROLES_COURT;
 
   const squad = useMemo<SquadSlot[]>(
     () =>
       roles.map((role) => {
-        const agent = factory.agents.find((a) => a.role === role);
-        const person = factory.people.find((p) => p.role === role);
+        const defaultAgent = factory.agents.find((a) => a.role === role);
+        const defaultPerson = factory.people.find((p) => p.role === role);
+        const override = overrides[role];
+
         return {
           role,
-          agentId: overrides[role]?.agentId ?? agent?.id,
-          personId: overrides[role]?.personId ?? person?.id,
+          agentId:
+            override !== undefined && "agentId" in override
+              ? override.agentId
+              : defaultAgent?.id,
+          personId:
+            override !== undefined && "personId" in override
+              ? override.personId
+              : defaultPerson?.id,
         };
       }),
     [roles, factory.agents, factory.people, overrides],
   );
+
+  const handleComposeSquad = async () => {
+    if (!title.trim()) {
+      toast.error("Veuillez renseigner au moins un titre pour composer la squad.");
+      return;
+    }
+
+    setIsComposing(true);
+    setAiRecommendation(null);
+
+    try {
+      const res = await composeSquadWithCopilot({
+        title: title.trim(),
+        description: description.trim() || title.trim(),
+        type,
+        priority,
+        process,
+        roles,
+      });
+
+      if (res.status === "proposal_ready" && res.proposal) {
+        const nextOverrides: Record<string, Partial<SquadSlot>> = { ...overrides };
+        const nextReasons: Record<string, string> = {};
+
+        for (const item of res.proposal) {
+          const role = item.roleBusinessCode as RoleKey;
+          const mappedAgentId = item.agentId
+            ? (AGENT_GUID_MAP[item.agentId] ?? item.agentId)
+            : undefined;
+
+          nextOverrides[role] = {
+            agentId: mappedAgentId,
+            personId: item.personId ?? undefined,
+          };
+
+          if (item.reason) {
+            nextReasons[role] = item.reason;
+          }
+        }
+
+        setOverrides(nextOverrides);
+        setAiReasons(nextReasons);
+        setAiRecommendation(res.message);
+        toast.success("Squad composée par l'agent IA !", {
+          description: res.message,
+        });
+      } else if (res.status === "needs_clarification") {
+        toast.info("Précisions requises par l'agent", {
+          description: res.message,
+        });
+        setAiRecommendation(res.message);
+      } else {
+        const errMsg = res.message || res.reason || "Impossible de proposer une squad.";
+        toast.warning("Proposition non disponible", {
+          description: errMsg,
+        });
+        setAiRecommendation(errMsg);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error("Erreur Squad Composer", { description: errorMessage });
+      setAiRecommendation(`Erreur : ${errorMessage}`);
+    } finally {
+      setIsComposing(false);
+    }
+  };
 
   const canSubmit = title.trim().length > 2 && description.trim().length > 10;
 
@@ -181,6 +263,8 @@ function NouvelleDemande() {
                   onClick={() => {
                     setProcess(p);
                     setOverrides({});
+                    setAiReasons({});
+                    setAiRecommendation(null);
                   }}
                   aria-pressed={process === p}
                   className={`rounded-xl border p-4 text-left transition-colors ${
@@ -220,20 +304,54 @@ function NouvelleDemande() {
           animate={{ opacity: 1, y: 0 }}
           className="panel h-fit p-6"
         >
-          <div className="flex items-center gap-2">
-            <Sparkles className="text-primary size-4" />
-            <h2 className="text-base font-semibold tracking-tight">Squad suggérée</h2>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="text-primary size-4" />
+              <h2 className="text-base font-semibold tracking-tight">Squad suggérée</h2>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleComposeSquad}
+              disabled={isComposing || !title.trim()}
+              className="gap-1.5 rounded-lg border-primary/30 text-xs font-medium hover:bg-primary/10 hover:text-primary transition-all"
+            >
+              {isComposing ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin text-primary" />
+                  <span>Composition IA…</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="size-3.5 text-primary" />
+                  <span>Squad Composer</span>
+                </>
+              )}
+            </Button>
           </div>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Composition proposée par le Factory Manager pour un projet {type} en process {process}.
-            Chaque binôme reste échangeable.
-          </p>
+
+          {aiRecommendation ? (
+            <div className="mt-3 rounded-xl border border-primary/25 bg-primary/5 p-3 text-xs leading-relaxed text-foreground animate-in fade-in">
+              <p className="mb-1 flex items-center gap-1.5 font-semibold text-primary">
+                <Bot className="size-3.5" /> Recommandation Squad Composer
+              </p>
+              <p>{aiRecommendation}</p>
+            </div>
+          ) : (
+            <p className="text-muted-foreground mt-2 text-sm">
+              Composition proposée par le Factory Manager pour un projet {type} en process {process}.
+              Cliquez sur <strong>Squad Composer</strong> pour composer avec l'agent IA.
+            </p>
+          )}
 
           <div className="mt-4 space-y-3">
             {squad.map((slot) => {
               const agent = factory.agents.find((a) => a.id === slot.agentId);
               const person = factory.people.find((p) => p.id === slot.personId);
               const altAgents = factory.agents.filter((a) => a.role === slot.role);
+              const reason = aiReasons[slot.role];
+
               return (
                 <div key={slot.role} className="rounded-xl border p-3.5">
                   <div className="flex items-center justify-between">
@@ -275,7 +393,10 @@ function NouvelleDemande() {
                       onChange={(e) =>
                         setOverrides((o) => ({
                           ...o,
-                          [slot.role]: { ...o[slot.role], personId: e.target.value },
+                          [slot.role]: {
+                            ...o[slot.role],
+                            personId: e.target.value || undefined,
+                          },
                         }))
                       }
                       className="bg-transparent text-sm outline-none"
@@ -288,6 +409,12 @@ function NouvelleDemande() {
                       ))}
                     </select>
                   </div>
+                  {reason && (
+                    <div className="mt-2.5 rounded-lg border border-border/60 bg-muted/40 p-2 text-[11px] leading-relaxed text-muted-foreground">
+                      <span className="font-medium text-foreground">Justification IA : </span>
+                      {reason}
+                    </div>
+                  )}
                 </div>
               );
             })}
