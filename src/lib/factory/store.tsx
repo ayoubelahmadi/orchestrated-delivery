@@ -42,7 +42,7 @@ interface FactoryContextValue extends FactoryState {
   blockTask: (taskId: string, reason: string) => void;
   startTask: (taskId: string) => void;
   reassign: (taskId: string, next: { agentId?: string; personId?: string }) => void;
-  finishAgentRun: (taskId: string) => string | undefined;
+  finishAgentRun: (taskId: string, customContent?: string) => string | undefined;
   updateLivrable: (id: string, content: string) => void;
   createDemande: (input: NewDemandeInput) => string;
 }
@@ -126,11 +126,11 @@ export function FactoryProvider({ children }: { children: ReactNode }) {
         }));
         toast.success("Tâche réassignée");
       },
-      finishAgentRun: (taskId) => {
+      finishAgentRun: (taskId, customContent) => {
         const task = getTask(taskId);
         if (!task) return undefined;
         const agent = state.agents.find((a) => a.id === task.agentId);
-        const content = ARTIFACTS_BY_ROLE[task.role];
+        const content = customContent?.trim() || ARTIFACTS_BY_ROLE[task.role];
         const name = DOC_NAME_BY_ROLE[task.role];
         const existing = state.livrables.find(
           (l) => l.demandeId === task.demandeId && l.name === name,

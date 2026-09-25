@@ -3,10 +3,13 @@ import { Bot, Check, FileText, Loader2, Play, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ARTIFACTS_BY_ROLE, DOC_NAME_BY_ROLE } from "@/lib/factory/artifacts";
+import { executeVbdAnalyst } from "@/lib/factory/copilotAnalyst";
 import { useFactory } from "@/lib/factory/store";
 import { Markdown, ModeBadge, Pill } from "@/components/factory/bits";
 import { cn } from "@/lib/utils";
@@ -23,6 +26,8 @@ export function AgentRunPanel({
   const { getTask, agentOf, personOf, getDemande, livrablesOf, finishAgentRun } = useFactory();
   const [logs, setLogs] = useState<string[]>([]);
   const [phase, setPhase] = useState<"idle" | "running" | "done">("idle");
+  const [generatedArtifact, setGeneratedArtifact] = useState<string>("");
+  const [runSource, setRunSource] = useState<"copilot-studio" | "simulated">("simulated");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const task = taskId ? getTask(taskId) : undefined;
@@ -37,36 +42,72 @@ export function AgentRunPanel({
       timers.current = [];
       setLogs([]);
       setPhase("idle");
+      setGeneratedArtifact("");
+      setRunSource("simulated");
     }
   }, [open, taskId]);
 
-  const start = () => {
+  const start = async () => {
     if (!task || !agent) return;
     setPhase("running");
     setLogs([]);
+    setGeneratedArtifact("");
+    setRunSource("simulated");
+
+    const isAnalyst = task.role === "ANALYST" && demande;
+    const analystPromise = isAnalyst
+      ? executeVbdAnalyst({ task, demande })
+      : Promise.resolve(null);
+
     const steps = agent.steps;
     steps.forEach((step, i) => {
       timers.current.push(
         setTimeout(
           () => setLogs((l) => [...l, step]),
-          900 + i * 1300,
+          900 + i * 1200,
         ),
       );
     });
+
+    const stepsDuration = 900 + steps.length * 1200;
+
     timers.current.push(
-      setTimeout(
-        () => {
-          setPhase("done");
-          finishAgentRun(task.id);
-        },
-        900 + steps.length * 1300,
-      ),
+      setTimeout(async () => {
+        let finalContent = ARTIFACTS_BY_ROLE[task.role] ?? "";
+        let source: "copilot-studio" | "simulated" = "simulated";
+
+        if (isAnalyst) {
+          try {
+            const res = await analystPromise;
+            if (res && res.success && res.content) {
+              finalContent = res.content;
+              source = "copilot-studio";
+              toast.success("Étude générée par Vbd Analyst (Copilot Studio)");
+            } else if (res && !res.success) {
+              if (res.content) {
+                finalContent = res.content;
+              }
+              toast.info("Étude de faisabilité générée (mode secours)", {
+                description:
+                  res.errorMessage || "Connecteur Copilot Studio non accessible en local.",
+              });
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        setGeneratedArtifact(finalContent);
+        setRunSource(source);
+        setPhase("done");
+        finishAgentRun(task.id, finalContent);
+      }, stepsDuration),
     );
   };
 
   const total = agent?.steps.length ?? 1;
   const pct = phase === "done" ? 100 : Math.round((logs.length / total) * 100);
-  const artifact = task ? ARTIFACTS_BY_ROLE[task.role] : "";
+  const artifact = generatedArtifact || (task ? ARTIFACTS_BY_ROLE[task.role] : "");
   const docName = task ? DOC_NAME_BY_ROLE[task.role] : "";
 
   return (
@@ -222,10 +263,17 @@ export function AgentRunPanel({
               </Button>
             </>
           )}
-          <span className="text-muted-foreground ml-auto inline-flex items-center gap-1.5 text-xs">
-            <Sparkles className="size-3.5" />
-            Exécution simulée
-          </span>
+          {runSource === "copilot-studio" ? (
+            <span className="text-primary font-medium ml-auto inline-flex items-center gap-1.5 text-xs">
+              <Bot className="size-3.5" />
+              Vbd Analyst (Copilot Studio)
+            </span>
+          ) : (
+            <span className="text-muted-foreground ml-auto inline-flex items-center gap-1.5 text-xs">
+              <Sparkles className="size-3.5" />
+              Exécution {task?.role === "ANALYST" ? "secours / simulée" : "simulée"}
+            </span>
+          )}
         </div>
       </SheetContent>
     </Sheet>

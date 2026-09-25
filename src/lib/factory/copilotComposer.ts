@@ -24,6 +24,7 @@ export const AGENT_GUID_MAP: Record<string, string> = {
   "c97e50c8-66b3-f111-aaac-7ced8d8527dd": "a-pm",
   "cc7e50c8-66b3-f111-aaac-7ced8d8527dd": "a-epics",
   "c77e50c8-66b3-f111-aaac-7ced8d8527dd": "a-analyst",
+  "a7c08e5e-d719-4d87-a48a-6abadcc52bf6": "a-analyst",
   "ce7e50c8-66b3-f111-aaac-7ced8d8527dd": "a-ux",
   "d27e50c8-66b3-f111-aaac-7ced8d8527dd": "a-qa",
   "d57e50c8-66b3-f111-aaac-7ced8d8527dd": "a-dataverse",
