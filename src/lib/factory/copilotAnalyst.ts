@@ -107,7 +107,7 @@ function extractTextFromAnyResponse(data: unknown): string {
  * Peut être renseigné ici ou via la variable d'environnement VITE_VBD_ANALYST_WORKFLOW_ENDPOINT.
  */
 export const VBD_ANALYST_WORKFLOW_ENDPOINT: string =
-  (import.meta.env?.VITE_VBD_ANALYST_WORKFLOW_ENDPOINT as string) || "";
+  (import.meta.env?.["VITE_VBD_ANALYST_WORKFLOW_ENDPOINT"] as string) || "";
 
 /**
  * Génère une étude de faisabilité et d'impact contextuelle complète et réaliste

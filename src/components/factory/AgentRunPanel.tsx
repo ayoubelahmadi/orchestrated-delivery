@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ARTIFACTS_BY_ROLE, DOC_NAME_BY_ROLE } from "@/lib/factory/artifacts";
 import { executeVbdAnalyst } from "@/lib/factory/copilotAnalyst";
+import { executeVbdArchitect } from "@/lib/factory/copilotArchitect";
 import { useFactory } from "@/lib/factory/store";
 import { Markdown, ModeBadge, Pill } from "@/components/factory/bits";
 import { cn } from "@/lib/utils";
@@ -55,9 +56,13 @@ export function AgentRunPanel({
     setRunSource("simulated");
 
     const isAnalyst = task.role === "ANALYST" && demande;
-    const analystPromise = isAnalyst
+    const isArchitect = task.role === "ARCHITECT" && demande;
+
+    const agentPromise = isAnalyst
       ? executeVbdAnalyst({ task, demande })
-      : Promise.resolve(null);
+      : isArchitect
+        ? executeVbdArchitect({ task, demande, upstreamLivrables: upstream })
+        : Promise.resolve(null);
 
     const steps = agent.steps;
     steps.forEach((step, i) => {
@@ -76,18 +81,21 @@ export function AgentRunPanel({
         let finalContent = ARTIFACTS_BY_ROLE[task.role] ?? "";
         let source: "copilot-studio" | "simulated" = "simulated";
 
-        if (isAnalyst) {
+        if (isAnalyst || isArchitect) {
           try {
-            const res = await analystPromise;
+            const res = await agentPromise;
+            const agentLabel = isArchitect ? "VbD Architect" : "Vbd Analyst";
+            const docLabel = isArchitect ? "Architecture technique" : "Étude de faisabilité";
+
             if (res && res.success && res.content) {
               finalContent = res.content;
               source = "copilot-studio";
-              toast.success("Étude générée par Vbd Analyst (Copilot Studio)");
+              toast.success(`${docLabel} générée par ${agentLabel} (Copilot Studio)`);
             } else if (res && !res.success) {
               if (res.content) {
                 finalContent = res.content;
               }
-              toast.info("Étude de faisabilité générée (mode secours)", {
+              toast.info(`${docLabel} générée (mode secours)`, {
                 description:
                   res.errorMessage || "Connecteur Copilot Studio non accessible en local.",
               });
@@ -266,12 +274,17 @@ export function AgentRunPanel({
           {runSource === "copilot-studio" ? (
             <span className="text-primary font-medium ml-auto inline-flex items-center gap-1.5 text-xs">
               <Bot className="size-3.5" />
-              Vbd Analyst (Copilot Studio)
+              {task?.role === "ARCHITECT"
+                ? "VbD Architect (Copilot Studio)"
+                : "Vbd Analyst (Copilot Studio)"}
             </span>
           ) : (
             <span className="text-muted-foreground ml-auto inline-flex items-center gap-1.5 text-xs">
               <Sparkles className="size-3.5" />
-              Exécution {task?.role === "ANALYST" ? "secours / simulée" : "simulée"}
+              Exécution{" "}
+              {task?.role === "ANALYST" || task?.role === "ARCHITECT"
+                ? "secours / contextuelle"
+                : "simulée"}
             </span>
           )}
         </div>
